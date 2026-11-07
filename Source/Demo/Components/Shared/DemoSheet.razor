@@ -1,0 +1,22 @@
+﻿@namespace Dialogs
+
+<SheetHeader>
+    <SheetTitle>@Context.Reference.Options.Title</SheetTitle>
+    <SheetDescription>@Context.Reference.Options.Description</SheetDescription>
+</SheetHeader>
+<SheetBody>
+    @Context.Reference.Content
+</SheetBody>
+<SheetFooter>
+    <Button OnClick="Close">
+        Close
+    </Button>
+</SheetFooter>
+
+@code {
+    [CascadingParameter] public SheetContext Context { get; set; } = default!;
+
+
+    private async Task Close()
+        => Context.Dismiss();
+}

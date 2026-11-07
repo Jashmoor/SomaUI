@@ -1,0 +1,43 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<button tab-trigger
+        type="button"
+        role="tab"
+        aria-selected="@IsSelected.ToString().ToLower()"
+        active="@(IsSelected)"
+        data-anchor="@(Parent?.AnchorScope)"
+        @onclick="OnClick"
+        @attributes="Attributes">
+    @ChildContent
+</button>
+
+@code {
+    [CascadingParameter] public Tabs? Parent { get; set; }
+    [Parameter, EditorRequired] public string Value { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    private bool IsSelected => (Parent?.UrlControlled == true ? Url == Value : Parent?.Selected == Value);
+    private string? Url;
+
+    protected override void OnParametersSet() {
+        if (Parent?.UrlControlled == true)
+        {
+            Url = NavigationManager.ToBaseRelativePath(NavigationManager.Uri)?.Split("?")[0];
+        }
+        base.OnParametersSet();
+        StateHasChanged();
+    }
+
+    private async Task OnClick() {
+        if (Parent != null)
+        {
+            if (Parent.UrlControlled == true)
+            {
+                NavigationManager.NavigateTo(Value);
+                return;
+            }
+            await Parent.SelectTab(Value);
+        }
+    }
+}

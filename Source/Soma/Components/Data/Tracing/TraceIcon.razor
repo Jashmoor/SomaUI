@@ -1,0 +1,8 @@
+﻿@namespace SomaUI.Tracing
+
+<span aria-hidden="true" class="@Cn.Merge("inline-flex size-4 shrink-0 items-center justify-center", Class)">@ChildContent</span>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+}

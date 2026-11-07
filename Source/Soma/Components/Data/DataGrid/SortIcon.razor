@@ -1,0 +1,21 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+@typeparam T where T : class
+
+@if (Column.Title == Context.State.SortingState.SortColumn)
+{
+    @(Context.State.SortingState.SortDirection switch {
+        SortDirection.Descending => @<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-360 280-560h400L480-360Z" /></svg>,
+        SortDirection.Ascending => @<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="m280-400 200-200 200 200H280Z" /></svg>,
+        _ => @<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M120-240v-80h240v80H120Zm0-200v-80h480v80H120Zm0-200v-80h720v80H120Z" /></svg>
+    })
+}
+else
+{
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M120-240v-80h240v80H120Zm0-200v-80h480v80H120Zm0-200v-80h720v80H120Z" /></svg>
+}
+
+@code {
+    [CascadingParameter] internal DataGridContext<T> Context { get; set; } = default!;
+    [Parameter] public PropertyColumn<T> Column { get; set; } = default!;
+}

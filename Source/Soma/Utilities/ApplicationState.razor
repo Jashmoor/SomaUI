@@ -1,0 +1,29 @@
+﻿@namespace SomaUI
+@implements IDisposable
+
+<CascadingValue Value="@Context" Name="__application-context" IsFixed="true">
+    @ChildContent
+    @if (Context.State.NavigationOpen)
+    {
+        <p>Navigation Open</p>
+    }
+</CascadingValue>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    internal ApplicationContext Context { get; } = new();
+
+    private void HandleStateChange()
+        => InvokeAsync(StateHasChanged);
+
+    protected override void OnInitialized() {
+        Context.OnStateChange += HandleStateChange;
+        base.OnInitialized();
+    }
+
+    public void Dispose() {
+        Context.OnStateChange -= HandleStateChange;
+    }
+}

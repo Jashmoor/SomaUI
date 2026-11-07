@@ -1,0 +1,65 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Sections
+@inherits BaseWithChildComponent
+@implements IAsyncDisposable
+
+@if (Tooltip.State.TriggerElement.HasValue && Tooltip.IsOpen)
+{
+    <SectionContent SectionId="@FloatingHost.Tooltip">
+        @RenderTooltipContent()
+    </SectionContent>
+}
+
+@code {
+    [CascadingParameter] internal TooltipContext Tooltip { get; set; } = default!;
+    [Inject] private IPopupService Service { get; set; } = default!;
+    [Inject] private FloatingContentService ContentService { get; set; } = default!;
+    private string TooltipId = "";
+    private bool _positioned = false;
+
+    protected override void OnInitialized() {
+        TooltipId = $"tooltip-{Tooltip.TooltipId}";
+        Tooltip.OnStateChange += HandleContextStateChange;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (Tooltip.IsOpen && !_positioned)
+        {
+            if (Tooltip.State.TriggerElement is ElementReference element)
+            {
+                ContentService.AddContent(Tooltip.TooltipId, RenderTooltipContent());
+                await Service.CalculatePosition<object>(element, Tooltip.TooltipId, null!, new
+                {
+                    placement = "top",
+                    offset = 10
+                });
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            _positioned = false;
+        }
+    }
+
+    private RenderFragment RenderTooltipContent() => __builder => {
+        <div id="@Tooltip.TooltipId"
+             role="tooltip"
+             tooltip-content
+             data-state="@(Tooltip.IsOpen ? "open" : "closed")"
+             @attributes="Attributes">
+            @ChildContent
+        </div>
+    };
+
+    private void HandleContextStateChange() {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public ValueTask DisposeAsync() {
+        if (Tooltip is not null)
+            Tooltip.OnStateChange -= HandleContextStateChange;
+        return ValueTask.CompletedTask;
+    }
+}

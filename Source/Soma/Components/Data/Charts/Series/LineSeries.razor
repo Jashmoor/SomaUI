@@ -1,0 +1,47 @@
+﻿@namespace SomaUI
+@using System.Globalization
+@inherits ChartComponent
+
+
+@if (Chart?.Scaled == true)
+{
+    @ChildContent
+    @if (Context?.XBandScale != null && Context?.YScale != null)
+    {
+        var categories = Context.XBandScale.Domain;
+        var halfBand = categories.Count > 1
+            ? (Context.PlotRight - Context.PlotLeft) / categories.Count / 2.0
+            : (Context.PlotRight - Context.PlotLeft) / 2.0;
+
+        @for (int i = 0; i < categories.Count; i++)
+        {
+            var idx = i;
+            var cat = categories[i];
+            var cx = Context.XBandScale.ScaleCenter(cat);
+            var zoneX = cx - halfBand;
+            var zoneW = halfBand * 2;
+
+            double topY = Context.PlotBottom;
+            if (idx < Context.Data.Count)
+            {
+                foreach (var key in Context.Config.Keys)
+                {
+                    var val = DataAccessor.GetDouble(Context.Data[idx], key);
+                    var y = Context.YScale.Scale(val);
+                    if (y < topY) topY = y;
+                }
+            }
+
+            <rect x="@F(Math.Max(zoneX, Context.PlotLeft))"
+                  y="@F(Context.PlotTop)"
+                  width="@F(Math.Min(zoneW, Context.PlotRight - Math.Max(zoneX, Context.PlotLeft)))"
+                  height="@F(Context.PlotHeight)"
+                  fill="transparent"
+                  @onmouseenter="@(() => Context.SetActiveIndex(idx, cx, topY))" />
+        }
+    }
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+}

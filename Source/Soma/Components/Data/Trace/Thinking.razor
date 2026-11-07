@@ -1,0 +1,63 @@
+﻿@namespace SomaUI
+@using System.Text
+
+<p thinking style="--steps: @(Steps);" @attributes="Attributes">
+    @foreach (var (block, index) in Elements.Select((block, index) => (block, index + 1)))
+    {
+        <span style="--line: @(index);">@block</span>
+    }
+</p>
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public int MaxWidth { get; set; } = 65;
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> Attributes { get; set; } = [];
+
+    private int Steps = 0;
+    private List<string> Elements { get; set; } = [];
+
+    public static List<string> SplitIntoBlocks(string text, int maxChars = 65) {
+        var blocks = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return blocks;
+        }
+
+        var words = text.Split(new[] { ' ', '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+        var currentBlock = new StringBuilder();
+
+        foreach (var word in words)
+        {
+            if (currentBlock.Length == 0)
+                currentBlock.Append(word);
+            else if (currentBlock.Length + 1 + word.Length <= maxChars)
+            {
+                currentBlock.Append(" ");
+                currentBlock.Append(word);
+            }
+            else
+            {
+                blocks.Add(currentBlock.ToString());
+                currentBlock.Clear();
+                currentBlock.Append(word);
+            }
+        }
+
+        if (currentBlock.Length > 0)
+            blocks.Add(currentBlock.ToString());
+
+        return blocks;
+    }
+
+    protected override void OnParametersSet() {
+        base.OnParametersSet();
+
+        if ((Text?.Length ?? 0) == 0)
+            return;
+
+        Elements = SplitIntoBlocks(Text!, MaxWidth);
+        Steps = Text!.Length / Elements.Count;
+
+    }
+}

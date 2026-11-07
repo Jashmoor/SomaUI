@@ -1,0 +1,35 @@
+﻿@namespace SomaUI
+
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+    [Parameter] public int Open { get; set; } = 700;
+    [Parameter] public int Close { get; set; } = 300;
+    [Parameter] public int ResetDelay { get; set; } = 5000;
+
+    private System.Timers.Timer? Reset;
+
+    public bool Interactive { get; private set; }
+
+    public event Action? OnInteraction;
+
+    public void NotifyOpen() {
+        Interactive = true;
+        Reset?.Stop();
+        Reset?.Dispose();
+        Reset = new System.Timers.Timer(ResetDelay);
+        Reset.Elapsed += async (s, e) => {
+            Interactive = false;
+            Reset?.Dispose();
+            Reset = null;
+            OnInteraction?.Invoke();
+        };
+        Reset.AutoReset = false;
+        Reset.Start();
+
+        OnInteraction?.Invoke();
+    }
+}

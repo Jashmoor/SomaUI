@@ -1,0 +1,23 @@
+﻿@namespace SomaUI
+@inherits FormComponent<string>
+
+<div search-input @attributes="Attributes">
+    @if (Icon != null)
+    {
+        @Icon
+    }
+    <div style="position: relative;">
+        <input id="@UniqueID" @bind:get="@Value" @bind:set="UpdateValue" @bind:event="oninput" type="text" placeholder="" />
+        <label for="@UniqueID">@Label</label>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public RenderFragment Icon { get; set; } = default!;
+
+    private async Task UpdateValue(string? value) {
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+    }
+}

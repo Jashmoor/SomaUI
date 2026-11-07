@@ -1,0 +1,133 @@
+﻿@namespace SomaUI
+@using System.Globalization
+
+@if (context?.CategoryScale != null && context.ValueScale != null)
+{
+    <g class="chart-bar-series">
+        @{
+            var data = context.Data;
+            var bandScale = context.CategoryScale;
+            var valueScale = context.ValueScale;
+            var isHorizontal = context.BarLayout == BarLayout.Horizontal;
+            var xKey = context.XDataKey ?? "name";
+            var allDataKeys = context.Config.Keys.ToList();
+            var seriesIndex = allDataKeys.IndexOf(DataKey);
+            var seriesCount = allDataKeys.Count;
+            if (seriesCount == 0) seriesCount = 1;
+            if (seriesIndex < 0) seriesIndex = 0;
+
+            var barThickness = bandScale.Bandwidth / seriesCount;   // was barWidth
+        }
+
+        @for (int i = 0; i < data.Count; i++)
+        {
+            var item = data[i];
+            var cat = DataAccessor.GetString(item, xKey);
+            var value = DataAccessor.GetDouble(item, DataKey);
+
+            var bandStart = bandScale.Scale(cat);
+            var barOffset = bandStart + seriesIndex * barThickness;  // position across the band
+            var valuePos = valueScale.Scale(value);
+            var baseline = valueScale.Scale(0);
+            var barLength = Math.Abs(baseline - valuePos);
+            var thickness = Math.Max(barThickness - 1, 1);
+
+            double rectX, rectY, rectW, rectH;
+            if (isHorizontal)
+            {
+                rectX = value >= 0 ? baseline : valuePos;
+                rectY = barOffset;
+                rectW = barLength;
+                rectH = thickness;
+            }
+            else
+            {
+                rectX = barOffset;
+                rectY = value >= 0 ? valuePos : baseline;
+                rectW = thickness;
+                rectH = barLength;
+            }
+
+            var fillColor = !string.IsNullOrEmpty(Fill) ? Fill : $"var(--color-{DataKey})";
+            var isActive = context.ActiveIndex == i;
+            var opacity = context.ActiveIndex >= 0 ? (isActive ? "1" : "0.3") : "1";
+            var animDelay = Animate ? $"animation-delay: {i * 0.05}s;" : "";
+            var animClass = Animate ? (isHorizontal ? "chart-bar-animate-x" : "chart-bar-animate") : "";
+            var originStyle = isHorizontal
+                ? $"transform-origin: {F(baseline)}px {F(barOffset + (barThickness - 1) / 2)}px;"
+                : $"transform-origin: {F(barOffset + (barThickness - 1) / 2)}px {F(baseline)}px;";
+
+            <rect @key="@($"{DataKey}-{i}-{context.__Version}")"
+                  x="@F(rectX)" y="@F(rectY)"
+                  width="@F(rectW)" height="@F(rectH)"
+                  rx="@F(Radius)"
+                  fill="@fillColor"
+                  opacity="@opacity"
+                  class="@($"{animClass}")"
+                  style="@($"{originStyle}{animDelay}")" />
+
+            @if (Label && barLength > 0)
+            {
+                double labelX, labelY;
+                string anchor, vAlign;
+                if (isHorizontal)
+                {
+                    labelX = value >= 0 ? rectX + rectW + 6 : rectX - 6;
+                    labelY = barOffset + (barThickness - 1) / 2;
+                    anchor = value >= 0 ? "start" : "end";
+                    vAlign = "central";
+                }
+                else
+                {
+                    labelX = barOffset + (barThickness - 1) / 2;
+                    labelY = rectY - 6;
+                    anchor = "middle";
+                    vAlign = "auto";
+                }
+
+                @(RenderLabelText(labelX, labelY, value.ToString("N0", CultureInfo.InvariantCulture),
+                                  context.__Version, i, anchor, vAlign))
+            }
+        }
+    </g>
+}
+
+@code {
+    [CascadingParameter(Name = "_context")]
+    private ChartContext? context { get; set; }
+
+    [CascadingParameter] internal ChartDisplay Chart { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string DataKey { get; set; } = "";
+
+    [Parameter]
+    public string? Fill { get; set; }
+
+    [Parameter]
+    public double Radius { get; set; } = 0;
+
+    [Parameter]
+    public string? StackId { get; set; }
+
+    [Parameter]
+    public bool Label { get; set; } = false;
+
+    [Parameter]
+    public bool Animate { get; set; } = true;
+
+    private static MarkupString RenderLabelText(double x, double y, string content,
+        int dataVersion, int index, string anchor = "middle", string vAlign = "auto") {
+        var xStr = x.ToString("G6", CultureInfo.InvariantCulture);
+        var yStr = y.ToString("G6", CultureInfo.InvariantCulture);
+        var encoded = System.Net.WebUtility.HtmlEncode(content);
+
+        return new MarkupString(
+            $"<text x=\"{xStr}\" y=\"{yStr}\" text-anchor=\"{anchor}\" " +
+            $"dominant-baseline=\"{vAlign}\" " +
+            $"font-size=\"12\" fill=\"currentColor\" class=\"chart-fade-animate\" " +
+            $"style=\"animation-delay: {index * 0.05}s;\">{encoded}</text>");
+    }
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+}

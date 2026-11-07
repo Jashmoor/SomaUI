@@ -1,0 +1,51 @@
+﻿@namespace SomaUI
+@typeparam T
+@inherits FormComponent<T>
+
+<CascadingValue Value="@GroupContext">
+    <div radio-group role="radiogroup" @attributes="Attributes">
+        @ChildContent
+    </div>
+    @if (Description != null)
+    {
+        <CascadingValue Value="For" IsFixed="true">
+            <FieldDescription T="T">
+                @Description
+            </FieldDescription>
+        </CascadingValue>
+    }
+</CascadingValue>
+
+    @code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+    [Parameter] public string? Description { get; set; } = null!;
+
+    internal RadioGroupContext<T> GroupContext = new();
+    private InputValidation? Validation;
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        Validation = new(this, () => EditContext, () => true, () => FieldContext?.Id ?? UniqueID!);
+    }
+
+    private async Task SelectValueAsync(T value) {
+        if (Disabled)
+            return;
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+        if (Validation is not null)
+            await Validation.NotifyFieldChanged();
+    }
+
+    protected override void OnParametersSet() {
+        base.OnParametersSet();
+        GroupContext.Value = Value;
+        GroupContext.Disabled = Disabled;
+        GroupContext.Required = Required;
+        GroupContext.Name = Name;
+        GroupContext.Select = SelectValueAsync;
+
+        if (Validation is not null)
+            Validation.OnParametersSet((For ?? ValueExpression));
+    }
+}

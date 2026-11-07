@@ -1,0 +1,157 @@
+﻿@namespace SomaUI
+@using System.Globalization
+@inherits ChartComponent
+
+@if (Context != null && Context.Data.Count > 0)
+{
+    <g class="chart-pie-series" @key="@($"pie-{DataKey}-{Context.__Version}")">
+        @{
+            var slices = BuildSlices();
+            var cx = Context.Width / 2;
+            var cy = Context.Height / 2;
+            Context.IsPieStyle = true;
+            Context.ValueDataKey = DataKey;
+            Context.NameDataKey = NameKey ?? Context.XDataKey ?? "name";
+        }
+
+        @foreach (var slice in slices)
+        {
+            var pathD = ArcGenerator.Arc(cx, cy, OuterRadius, InnerRadius,
+                slice.StartAngle, slice.EndAngle);
+            var isActive = Context.ActiveIndex == slice.Index;
+            var opacity = Context.ActiveIndex >= 0 ? (isActive ? "1" : "0.3") : "1";
+            var transform = isActive ? $"translate({F(ActiveOffset(slice, cx, cy).dx)},{F(ActiveOffset(slice, cx, cy).dy)})" : "";
+            var transforn = isActive ? "scale(1.1)" : "";
+            var animClass = Animate ? "chart-pie-animate" : "";
+            var animDelay = Animate ? $"animation-delay: {slice.Index * 0.1}s;" : "";
+            var originStyle = $"transform-origin: {F(cx)}px {F(cy)}px;";
+
+            var (centX, centY) = ArcGenerator.Centroid(cx, cy, OuterRadius, InnerRadius,
+                slice.StartAngle, slice.EndAngle);
+
+            <path d="@pathD"
+                  fill="@slice.Fill"
+                  stroke="@(Stroke ?? "hsl(var(--background))")"
+                  stroke-width="@F(StrokeWidth)"
+                  transform="@transforn"
+                  class="@animClass"
+                  style="@($"{originStyle}{animDelay}")"
+                  @onmouseenter="() => Context.SetActiveIndex(slice.Index, centX, centY)"
+                  @onmouseleave="() => Context.ClearActiveIndex()" />
+
+            @if (Label)
+            {
+                var (lx, ly) = ArcGenerator.Centroid(cx, cy, OuterRadius, InnerRadius,
+                    slice.StartAngle, slice.EndAngle);
+                @PieLabelText(F(lx), F(ly), LabelFormat(slice.Label ?? ""), opacity)
+            }
+        }
+    </g>
+}
+
+@code {
+
+    [Parameter, EditorRequired]
+    public string DataKey { get; set; } = "";
+
+    [Parameter]
+    public string? NameKey { get; set; }
+
+    [Parameter]
+    public double OuterRadius { get; set; } = 120;
+
+    [Parameter]
+    public double InnerRadius { get; set; } = 0;
+
+    [Parameter]
+    public double StartAngle { get; set; } = 0;
+
+    [Parameter]
+    public double EndAngle { get; set; } = 360;
+
+    [Parameter]
+    public bool Label { get; set; } = false;
+
+    [Parameter]
+    public Func<string, string> LabelFormat { get; set; } = (label) => label;
+
+    [Parameter]
+    public string? Stroke { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; } = 2;
+
+    [Parameter]
+    public double ActivePush { get; set; } = 6;
+
+    [Parameter]
+    public double PaddingAngle { get; set; } = 0;
+
+    [Parameter]
+    public bool Animate { get; set; } = true;
+
+    private List<PieSlice> BuildSlices() {
+        if (Context == null) return [];
+
+        var data = Context.Data;
+        var nameKey = NameKey ?? Context.XDataKey ?? "name";
+
+        var values = DataAccessor.GetAllDoubles(data, DataKey);
+        var total = values.Sum();
+        if (total == 0) return [];
+
+        var slices = new List<PieSlice>();
+        var startRad = ChartMath.ToRadians(StartAngle);
+        var totalRad = ChartMath.ToRadians(EndAngle - StartAngle);
+        var padRad = ChartMath.ToRadians(PaddingAngle);
+
+        for (int i = 0; i < data.Count; i++)
+        {
+            var name = DataAccessor.GetString(data[i], nameKey);
+            var value = values[i];
+            var sweepAngle = (value / total) * totalRad;
+
+            var fill = DataAccessor.GetString(data[i], "fill");
+            if (string.IsNullOrEmpty(fill))
+            {
+                fill = Context.Config.TryGetValue(name, out var entry) && entry.Color != null
+                    ? entry.Color
+                    : $"var(--color-{name})";
+            }
+
+            slices.Add(new PieSlice {
+                Index = i,
+                Name = name,
+                Value = value,
+                StartAngle = startRad + padRad / 2,
+                EndAngle = startRad + sweepAngle - padRad / 2,
+                Fill = fill,
+                Label = Label ? value.ToString("G", CultureInfo.InvariantCulture) : null
+            });
+
+            startRad += sweepAngle;
+        }
+
+        return slices;
+    }
+
+    private (double dx, double dy) ActiveOffset(PieSlice slice, double cx, double cy) {
+        var midAngle = (slice.StartAngle + slice.EndAngle) / 2;
+        return (ActivePush * Math.Sin(midAngle), -ActivePush * Math.Cos(midAngle));
+    }
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+
+    private static MarkupString PieLabelText(string x, string y, string content, string opacity) =>
+        new($"<text x=\"{x}\" y=\"{y}\" text-anchor=\"middle\" dominant-baseline=\"central\" opacity=\"{opacity}\" fill=\"hsl(var(--background))\" font-size=\"12\" font-weight=\"600\" pointer-events=\"none\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+
+    private class PieSlice {
+        public int Index { get; init; }
+        public string Name { get; init; } = "";
+        public double Value { get; init; }
+        public double StartAngle { get; init; }
+        public double EndAngle { get; init; }
+        public string Fill { get; init; } = "";
+        public string? Label { get; init; }
+    }
+}

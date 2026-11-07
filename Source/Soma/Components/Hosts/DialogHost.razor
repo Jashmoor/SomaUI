@@ -1,0 +1,40 @@
+﻿@namespace SomaUI
+@inject DialogService DialogService
+@implements IDisposable
+
+@if (DialogService.Dialogs.Any())
+{
+    @foreach (var (dialog, index) in DialogService.Dialogs.Select((dialog, index) => (dialog, index)))
+    {
+        <Dialog @key="dialog.Id" Open="true" IsClosing="dialog.IsClosing" OpenChanged="@((bool open) => { if (!open) { DialogService.FinalizeClose(dialog.Id, null); } })">
+            <DialogContent ZIndex="@(50 + (index * 10))" Options="dialog.Options">
+                <CascadingValue Value="new DialogContext(dialog, DialogService)" IsFixed="true">
+                    @if (dialog.ComponentType is not null)
+                    {
+                        <DynamicComponent Type="@dialog.ComponentType" Parameters="@dialog.Parameters" />
+                    }
+                    @if (dialog.Content is not null)
+                    {
+                        @dialog.Content
+                    }
+                </CascadingValue>
+            </DialogContent>
+        </Dialog>
+    }
+}
+
+@code {
+    [Parameter] public EventCallback<bool> DialogToggle { get; set; }
+
+    protected override void OnInitialized() {
+        DialogService.OnChange += HandleStateChange;
+    }
+
+    private void HandleStateChange() {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() {
+        DialogService.OnChange -= HandleStateChange;
+    }
+}

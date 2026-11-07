@@ -1,0 +1,52 @@
+﻿[chipset] {
+    display: inline-flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+}
+
+[chip] {
+    --_padding: var(--spacing-xs);
+    --_size: 2rem;
+    --ds-font-size: var(--text-xs);
+    --ds-line-height: var(--text-xs--line-height);
+    --ds-letter-spacing: var(--leading-snug);
+    --ds-font-weight: var(--font-weight-light);
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    block-size: var(--_size);
+    min-inline-size: var(--_size);
+    inline-size: fit-content;
+    background-color: var(--muted);
+    border-width: 1px;
+    border-color: var(--border);
+    color: var(--card-foreground);
+    padding: 0 var(--_padding);
+    text-transform: none;
+    border-radius: var(--spacing-sm);
+    transition: transform var(--speed3), border-radius var(--speed3), padding var(--speed3);
+    user-select: none;
+    gap: calc(var(--_padding) * 0.6);
+
+    &[selected] {
+        background-color: var(--color-neutral-100);
+        color: contrast-color(var(--color-neutral-100));
+    }
+}
+
+    [chip].small {
+        --_size: 1.25rem;
+        font-size: 0.75rem;
+        margin: 0;
+        font: var(--support-light);
+    }
+
+    [chip].large {
+        --_padding: 1.25rem;
+        --_size: 2.5rem;
+    }
+
+    [chip][fill] {
+        border: none;
+    }

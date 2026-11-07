@@ -1,0 +1,89 @@
+﻿@page "/calendar"
+
+<EventCalendar Items="@Events"
+               Start="x => x.Start"
+               End="x => x.End"
+               EventTitle="x => x.Title"
+               StartFormat="@(x => x.ToString("dd MMM, yyy"))"
+               EventClass="GetCategoryClass"
+               View="CalendarView.Month">
+    <EventTemplate>
+        @if(context.Category == "travel")
+        {
+            <Collapsible Title="Travel Details">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>@context.Start</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Marquee>
+                            <Button>Lets</Button>
+                            <Button>Go</Button>
+                            <Button>On</Button>
+                            <Button>Holibobs</Button>
+                        </Marquee>
+                    </CardContent>
+                </Card>
+            </Collapsible>
+        }
+        else if (context.Category == "meeting")
+        {
+            <Item>
+                <ItemMedia>
+                    <Avatar Source="null">
+                        <Fallback>
+                            <span>XS</span>
+                        </Fallback>
+                    </Avatar>
+                </ItemMedia>
+                <ItemContent>
+                    <ItemTitle>@context.Category</ItemTitle>
+                    <ItemDescription>@context.Title</ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                    <Button>Cancel</Button>
+                </ItemActions>
+            </Item>
+        }
+        else
+        {
+            <Card>
+                <CardHeader>
+                    <CardTitle>@context.Category</CardTitle>
+                    <CardDescription>@context.Title</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <span>@context.Start.ToString("dd MMM, yyyy")</span>
+                </CardContent>
+            </Card>
+        }
+    </EventTemplate>
+</EventCalendar>
+
+@code {
+    private sealed record DemoEvent(string Title, DateTime Start, DateTime? End, string Category);
+
+    private static readonly DateTime today = DateTime.Today;
+
+    private readonly List<DemoEvent> Events = new()
+    {
+        new("Daily standup", today.AddHours(9), today.AddHours(9.25), "meeting"),
+        new("Sprint planning", today.AddHours(10), today.AddHours(11.5), "meeting"),
+        new("Marketing sync", today.AddHours(13), today.AddHours(13.75), "meeting"),
+        new("1:1 with Priya", today.AddDays(-2).AddHours(15), today.AddDays(-2).AddHours(15.5), "meeting"),
+        new("Design review", today.AddDays(1).AddHours(13), today.AddDays(1).AddHours(14), "meeting"),
+        new("Dentist appointment", today.AddDays(1).AddHours(8.5), null, "personal"),
+        new("Release v2.4", today.AddDays(3), null, "release"),
+        new("Sprint retro", today.AddDays(4).AddHours(16), today.AddDays(4).AddHours(17), "meeting"),
+        new("Code freeze", today.AddDays(5), null, "release"),
+        new("NDC Conference", today.AddDays(7), today.AddDays(9), "travel"),
+    };
+
+    private string? GetCategoryClass(DemoEvent e) => e.Category switch {
+        "meeting" => "bg-sky-500/15 text-sky-700 hover:bg-sky-500/25 dark:text-sky-400",
+        "release" => "bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/25 dark:text-emerald-400",
+        "travel" => "bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 dark:text-amber-400",
+        "personal" => "bg-violet-500/15 text-violet-700 hover:bg-violet-500/25 dark:text-violet-400",
+        _ => null,
+    };
+}

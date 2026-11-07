@@ -1,0 +1,9 @@
+﻿@namespace SomaUI
+
+<div progress-label>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+}

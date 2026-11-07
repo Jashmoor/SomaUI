@@ -1,0 +1,30 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Sections
+@inherits BaseComponent
+
+@if (Dialog?.Open == true)
+{
+    <div role="dialog" dialog id="@UniqueID" style="z-index: @(ZIndex);">
+        <div overlay @onclick="HandleOverlayClose" show="@Dialog.Open" closing="@Dialog.Closing" />
+        <div dialog-container show="@(!Dialog.Closing)" @attributes="Attributes">
+            @ChildContent
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public Dialog? Dialog { get; set; }
+    [Parameter] public int ZIndex { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+    [Parameter] public DialogOptions Options { get; set; } = new();
+
+    private async Task HandleOverlayClose() {
+        if (Options.Dismissable && Dialog is not null)
+            await Dialog.SetOpen(false);
+    }
+
+    private async Task HandleClose() {
+        if (Dialog is not null)
+            await Dialog.SetOpen(false);
+    }
+}

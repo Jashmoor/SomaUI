@@ -1,0 +1,29 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div avatar size="@Size.ToString().ToLower()">
+    <img src="@Source"
+         alt="@Alt"
+         avatar-image
+         data-state="loading"
+         onload="this.dataset.state = 'loaded'"
+         onerror="this.dataset.state = 'error'" />
+
+    <div avatar-loading>
+        <Spinner />
+    </div>
+
+    @if (Fallback is not null)
+    {
+        <span avatar-fallback>
+            @Fallback
+        </span>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string? Source { get; set; }
+    [Parameter] public string? Alt { get; set; }
+    [Parameter] public RenderFragment Fallback { get; set; } = default!;
+    [Parameter] public AvatarSize Size { get; set; } = AvatarSize.Default;
+}

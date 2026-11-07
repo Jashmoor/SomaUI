@@ -1,0 +1,102 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+
+@if (IsLink)
+{
+    <a href="@(IsDisabled ? null : Href)"
+       button
+       target="@Rel"
+       disabled="@IsDisabled"
+       variant="@Variant.ToString().ToLower()"
+       size="@Size.ToString().ToLower()"
+       tabindex="@(IsDisabled ? -1 : 0)"
+       @onclick="HandleClick"
+       @onkeydown="HandleKeyDown"
+       @onmouseenter="HandleMouseEnter"
+       @onmouseleave="HandleMouseLeave"
+       @onfocus="HandleFocus"
+       @onblur="HandleBlur"
+       @attributes="Attributes">
+        @if (Loading)
+        {
+            @if (LoadingTemplate != null)
+            {
+                <span>@LoadingTemplate</span>
+            }
+            else
+            {
+                <Spinner />
+            }
+            @if (!string.IsNullOrEmpty(LoadingText))
+            {
+                @LoadingText
+            }
+            else
+            {
+                @ChildContent
+            }
+        }
+        else
+        {
+            @if (Icon != null && IconPosition == IconPosition.Start)
+            {
+                <span>@Icon</span>
+            }
+            @ChildContent
+            @if (Icon != null && IconPosition == IconPosition.End)
+            {
+                <span>@Icon</span>
+            }
+        }
+    </a>
+}
+else
+{
+    <button data-button
+            @ref="Element"
+            type="button"
+            variant="@Variant.ToString().ToLower()"
+            size="@Size.ToString().ToLower()"
+            disabled="@IsDisabled"
+            tabindex="@(IsDisabled ? -1 : 0)"
+            @onclick="HandleClick"
+            @onkeydown="HandleKeyDown"
+            @onmouseenter="HandleMouseEnter"
+            @onmouseleave="HandleMouseLeave"
+            @onfocus="HandleFocus"
+            @onblur="HandleBlur"
+            @attributes="Attributes">
+        @if (Loading)
+        {
+            @if (LoadingTemplate != null)
+            {
+                <span>@LoadingTemplate</span>
+            }
+            else
+            {
+                <Spinner />
+            }
+            @if (!string.IsNullOrEmpty(LoadingText))
+            {
+                @LoadingText
+            }
+            else
+            {
+                @ChildContent
+            }
+        }
+        else
+        {
+            @if (Icon != null && IconPosition == IconPosition.Start)
+            {
+                <span>@Icon</span>
+            }
+            @ChildContent
+            @if (Icon != null && IconPosition == IconPosition.End)
+            {
+                <span>@Icon</span>
+            }
+        }
+    </button>
+}

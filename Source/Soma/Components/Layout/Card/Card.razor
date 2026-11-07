@@ -1,0 +1,7 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div data-card card-small="@(Size == CardSize.Small)" @attributes="Attributes" @oncontextmenu="Context" @oncontextmenu:stopPropagation="true">
+    @ChildContent
+</div>
+

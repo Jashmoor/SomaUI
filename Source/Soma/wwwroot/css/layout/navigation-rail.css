@@ -1,0 +1,9 @@
+﻿[navigation-rail]{
+    position: sticky;
+    top: 0;
+    inline-size: 100%;
+    display: flex;
+    background: var(--surface-2);
+    gap: var(--spacing-sm);
+    min-block-size: calc(var(--spacing-xxs) * 14);
+}

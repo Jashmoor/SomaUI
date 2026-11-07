@@ -1,0 +1,9 @@
+﻿@namespace SomaUI.Tracing
+
+<div>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+}

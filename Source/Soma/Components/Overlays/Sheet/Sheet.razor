@@ -1,0 +1,29 @@
+﻿@namespace SomaUI
+
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public bool IsClosing { get; set; }
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+
+    private bool _internal;
+
+    public bool Closing => IsClosing || _internal;
+
+    internal async Task SetOpen(bool open) {
+        if (!open && Open && !Closing)
+        {
+            _internal = true;
+            StateHasChanged();
+            await Task.Delay(300);
+            _internal = false;
+        }
+
+        Open = open;
+        await OpenChanged.InvokeAsync(Open);
+    }
+}

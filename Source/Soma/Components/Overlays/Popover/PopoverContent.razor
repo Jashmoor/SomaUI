@@ -1,0 +1,49 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Sections
+@inherits BaseWithChildComponent
+
+@if (Parent?.Open == true)
+{
+    <SectionContent SectionId="FloatingHost.Popover">
+        <div overlay show="@Parent?.Open" @onclick="ClosePopover" @onclick:stopPropagation="true"></div>
+        @RenderPopoverContent()
+    </SectionContent>
+}
+
+
+@code {
+    [CascadingParameter] public Popover Parent { get; set; } = default!;
+    [Inject] private IPopupService Service { get; set; } = default!;
+
+    private bool _positioned;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (Parent.Open && !_positioned)
+        {
+            if (Parent.Element is ElementReference element)
+            {
+                await Service.CalculatePosition<object>(element, UniqueID, null!, new {
+                    placement = "bottom",
+                    offset = 10
+                });
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            _positioned = false;
+        }
+    }
+
+    private async Task ClosePopover() {
+        if (Parent != null)
+            await Parent.SetOpen(false);
+    }
+
+    private RenderFragment RenderPopoverContent() => __builder => {
+        <div id="@UniqueID" popover data-state="@(Parent.Open ? "open" : "closed")" @attributes="Attributes">
+            @ChildContent
+        </div>
+    };
+}

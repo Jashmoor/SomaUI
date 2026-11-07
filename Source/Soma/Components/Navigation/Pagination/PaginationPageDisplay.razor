@@ -1,0 +1,19 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div pagination-page-display @attributes="Attributes">
+    @if (Context?.State is not null)
+    {
+        var state = Context.State;
+        <span>@($"{state.CurrentPage} of {state.TotalPages}")</span>
+    }
+    else
+    {
+        @ChildContent
+    }
+</div>
+
+@code {
+    [CascadingParameter] internal PaginationContext? Context { get; set; }
+
+}

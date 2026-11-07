@@ -1,0 +1,41 @@
+﻿@namespace SomaUI
+
+<div chart-legend @attributes="AdditionalAttributes">
+    @if (Title is not null)
+    {
+        <h3>@Title</h3>
+    }
+    @if (Context != null)
+    {
+        <div chart-legend-item>
+            @foreach (var (key, entry) in Context.Config)
+            {
+                var label = entry.Label ?? key;
+                var color = entry.Color ?? $"var(--primary-{key})";
+
+                <div chart-legend-group>
+                    <div style="background: @color; block-size: 0.5rem; inline-size: 0.5rem;"></div>
+                    <span class="text-muted-foreground">@label</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [CascadingParameter(Name = "_context")] internal ChartContext Context { get; set; } = default!;
+
+    [Parameter]
+    public string? NameKey { get; set; }
+
+    [Parameter] public string? Title { get; set; }
+
+    [Parameter]
+    public LegendAlign Align { get; set; } = LegendAlign.Bottom;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

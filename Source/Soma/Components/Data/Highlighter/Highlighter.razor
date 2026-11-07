@@ -1,0 +1,17 @@
+﻿@namespace SomaUI
+@inherits BaseComponent
+@using System.Text.RegularExpressions
+
+@foreach (var fragment in _Fragments.Span)
+{
+    if (!string.IsNullOrWhiteSpace(_regex) && Regex.IsMatch(fragment, _regex, CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase))
+    {
+        <mark matched @attributes="@Attributes">
+            @fragment
+        </mark>
+    }
+    else
+    {
+        @fragment
+    }
+}

@@ -1,0 +1,17 @@
+﻿[auto-marker] {
+    --ds-font-size: var(--text-sm);
+    --ds-line-height: var(--text-sm--line-height);
+    --ds-letter-spacing: var(--tracking-wider);
+    --ds-font-weight: var(--font-weight-light);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-inline-size: 20ch;
+    inline-size: 20ch;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: opacity;
+    transition-duration: var(--animation-speed-fast);
+    transition-timing-function: var(--ease-in-out);
+}

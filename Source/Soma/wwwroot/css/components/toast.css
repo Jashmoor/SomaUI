@@ -1,0 +1,107 @@
+﻿@media (hover: none) and (pointer: coarse) {
+    [toaster][data-lifted] {
+        transform: none;
+    }
+}
+
+[toaster] {
+    --_background: var(--card);
+    --_border: var(--border);
+    --width: 32rem;
+    --_text: var(--card-foreground);
+    position: fixed;
+    width: var(--width);
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    outline: none;
+    z-index: 999999999;
+    transition: transform var(--speed2) ease;
+    bottom: var(--spacing);
+    right: var(--spacing);
+    gap: var(--spacing-sm);
+}
+
+[toast][mounted][lifted] {
+    --scale: calc(var(--toasts-before) * 0.03 + 1);
+    --y: translateY(calc(var(--lift) * var(--gap) * var(--toasts-before))) scale(calc(1 - (var(--toasts-before) * 0.05)));
+    height: var(--front-toast-height);
+    height: 73px;
+}
+
+[toast][mounted] {
+    --y: translateY(0);
+    opacity: 1;
+}
+
+    [toast][mounted][expanded] {
+        --y: translateY(calc(var(--lift) * var(--offset)));
+        height: var(--initial-height);
+        height: auto;
+
+        ::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            height: calc(var(--gap) + 1px);
+            bottom: 100%;
+            width: 100%;
+        }
+    }
+
+
+[toast] {
+    --y: translateY(100%);
+    --lift: -1;
+    --lift-amount: calc(var(--lift) * var(--spacing));
+    --gap: 2rem;
+    --_background: var(--card);
+    position: absolute;
+    z-index: var(--z-index);
+    opacity: 0;
+    transform: var(--y);
+    touch-action: none;
+    transition: transform 400ms, opacity 400ms, height 400ms, box-shadow 200ms;
+    box-sizing: border-box;
+    outline: none;
+    overflow-wrap: anywhere;
+    bottom: 0;
+    right: 0;
+    inline-size: var(--width);
+
+    &:focus-visible {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(0, 0, 0, 0.2);
+    }
+
+    &[success] {
+        --_background: var(--surface-2);
+        color: var(--primary);
+    }
+
+    &[error] {
+        --_background: red;
+    }
+
+    &[preventable] {
+        --_background: color-mix(var(--card), var(--info) 5%);
+    }
+}
+
+    [toast][rendered] {
+        padding: var(--spacing);
+        background: var(--_background);
+        border-color: var(--border);
+        border-width: 1px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing);
+    }
+
+@media screen and (max-width: 600px) {
+
+    [toaster] {
+        --width: calc(100dvw - calc(2 * var(--spacing)));
+    }
+}

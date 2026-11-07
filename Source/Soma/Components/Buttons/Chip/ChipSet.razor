@@ -1,0 +1,107 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+@typeparam TValue
+
+<div chipset>
+    <CascadingValue Value="Context" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    internal ChipContext Context = new();
+    private TValue? currentValue;
+    private bool initialized;
+
+    [Parameter] public EventCallback<TValue?> ValueChanged { get; set; }
+    [Parameter] public TValue? Value { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public bool Required { get; set; }
+
+    protected override void OnInitialized() {
+        Context.IsSelected = IsSelectedCore;
+        Context.ToggleAsync = ToggleCoreAsync;
+        // Context.DismissAsync = DismissCoreAsync;
+    }
+
+    private bool IsSelectedCore(object? value) {
+        if (value is not TValue typed)
+        {
+            return false;
+        }
+
+        return
+            EqualityComparer<TValue>.Default.Equals(currentValue, typed);
+    }
+
+    private async Task ToggleCoreAsync(object? value) {
+        if (Disabled || value is not TValue typed)
+            return;
+
+            var wasSelected = EqualityComparer<TValue>.Default.Equals(currentValue, typed);
+
+            if (wasSelected && Required)
+            {
+                return;
+            }
+
+            currentValue = wasSelected ? default : typed;
+
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(currentValue);
+            }
+        // if (SelectionMode == ChipSelectionMode.Single)
+        // {
+        // }
+        // else
+        // {
+        //     var next = new List<TValue>(currentValues);
+
+        //     if (next.Contains(typed))
+        //     {
+        //         if (Required && next.Count == 1)
+        //         {
+        //             return;
+        //         }
+
+        //         next.Remove(typed);
+        //     }
+        //     else
+        //     {
+        //         next.Add(typed);
+        //     }
+
+        //     currentValues = next;
+
+        //     if (ValuesChanged.HasDelegate)
+        //     {
+        //         await ValuesChanged.InvokeAsync(next);
+        //     }
+        // }
+
+        Context.NotifyStateChange();
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet() {
+        if (!initialized || ValueChanged.HasDelegate)
+        {
+            currentValue = Value;
+        }
+
+        // if (!initialized || ValuesChanged.HasDelegate)
+        // {
+        //     currentValues = Values is null ? [] : [.. Values];
+        // }
+
+        initialized = true;
+
+        // Context.Variant = Variant;
+        // Context.Size = Size;
+        // Context.Dismissible = Dismissible;
+        // Context.ShowCheckMark = ShowCheckMark;
+        Context.Disabled = Disabled;
+        // Context.SelectionMode = SelectionMode;
+    }
+}

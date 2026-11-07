@@ -1,0 +1,12 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Sections
+
+<SectionContent SectionName="__breadcrumbs">
+    <div breadcrumb-list>
+        @ChildContent
+    </div>
+</SectionContent>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+}

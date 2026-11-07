@@ -1,0 +1,23 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<button @ref="Element"
+        fab
+        fixed="@Fixed"
+        @onclick="HandleClick"
+        type="@Type"
+        @attributes="Attributes">
+    @ChildContent
+</button>
+
+
+@code {
+    [Parameter] public bool Fixed { get; set; } = false;
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string? Type { get; set; } = "button";
+
+    private async Task HandleClick() {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+}

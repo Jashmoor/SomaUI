@@ -1,0 +1,28 @@
+﻿mark,
+::selection,
+::target-text,
+::search-text {
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+}
+
+mark[matched] {
+    background: rgb(from currentColor calc(255 - r) calc(255 - g) calc(255 - b) / 70%);
+}
+
+::selection {
+    background: rgb(from currentColor r calc(255 - g) calc(255 - b) / 70%);
+}
+
+::target-text {
+    background: rgb(from currentColor calc(255 - r) g calc(255 - b) / 70%);
+}
+
+::search-text {
+    background: rgb(from currentColor calc(255 - r) calc(255 - g) b / 70%);
+
+    &:current {
+        background: rgb(from currentColor calc(255 - r) calc(255 - g) b / 100%);
+    }
+}

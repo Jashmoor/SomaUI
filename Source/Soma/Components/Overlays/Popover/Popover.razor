@@ -1,0 +1,23 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div @ref="Element" id="@UniqueID" popover-display @attributes="Attributes">
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+
+    internal async Task SetOpen(bool open) {
+        Open = open;
+        await OpenChanged.InvokeAsync(Open);
+        StateHasChanged();
+    }
+
+    internal async Task Toggle() {
+        await SetOpen(!Open);
+    }
+}

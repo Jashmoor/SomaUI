@@ -1,0 +1,346 @@
+﻿[dropdown] {
+    anchor-name: --dropdown;
+    anchor-scope: --dropdown;
+    container-type: anchored;
+    inline-size: fit-content;
+    block-size: fit-content;
+}
+
+[dropdown-trigger] {
+    pointer-events: all;
+
+    :hover {
+        cursor: pointer;
+    }
+}
+
+[dropdown-content] {
+    &[open] {
+        opacity: 1;
+        z-index: 10;
+        top: unset;
+        left: unset;
+    }
+
+    position: fixed;
+    z-index: -10;
+    isolation: isolate;
+    opacity: 0;
+    inline-size: fit-content;
+    min-inline-size: calc(var(--spacing-xxs) * 20);
+    background: var(--background);
+    border-radius: var(--radius);
+    color: var(--popover-foreground);
+    --ds-font-size: var(--text-sm);
+    --ds-line-height: var(--text-sm--line-height);
+    overflow-y: auto;
+    max-height: var(--container-sm);
+    box-shadow: 0 4px 6px -1px var(--background), 0 2px 4px -2px var(--background);
+    overflow-y: auto;
+    border-color: var(--border);
+    border-width: 1px;
+    transition: all var(--default-transition-duration) var(--ease-in-out);
+    transition-behavior: allow-discrete;
+}
+
+[dropdown-item] {
+    --ds-font-size: var(--text-sm);
+    --ds-line-height: var(--text-sm--line-height);
+    --ds-font-weight: var(--font-weight-light);
+    user-select: none;
+    border-radius: var(--radius);
+    padding-block: var(--spacing-xxs);
+    padding-inline: var(--spacing-xs);
+    corner-shape: squircle;
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    justify-content: space-between;
+    transition: background var(--default-transition-duration) var(--ease-in-out);
+
+    &:hover {
+        background: var(--accent);
+        color: var(--accent-foreground);
+        cursor: pointer;
+
+        & * {
+            cursor: pointer;
+        }
+    }
+}
+
+[dropdown-label] {
+    color: color-mix(var(--muted-foreground), transparent 10%);
+    padding-block-start: var(--spacing-xxs);
+    padding-inline: var(--spacing-xs);
+}
+
+html:has( [dropdown-content][open]),
+html:has( [popover][open]) {
+    overflow: hidden;
+    user-select: none;
+    opacity: 0.95;
+}
+
+
+[popup] {
+    position: absolute;
+    position-anchor: --dropdown;
+    position-area: bottom left;
+    position-try: flip-block most-width;
+    min-width: var(--container-sm);
+    width: fit-content;
+    background: var(--card);
+    padding: var(--spacing-xs);
+    border-radius: calc(var(--spacing) * 2.5);
+    border-width: 1px;
+    border-color: var(--border);
+    corner-shape: squircle;
+    pointer-events: all;
+    opacity: 0;
+    transition: opacity var(--default-transition-duration) var(--ease-in-out);
+}
+
+[popup-item] {
+    background: var(--card);
+    transition: opacity var(--speed2), background var(--speed2);
+    pointer-events: all;
+
+    :hover {
+        background: var(--muted);
+    }
+}
+
+[popover-display] {
+    anchor-name: --popover;
+    anchor-scope: --popover;
+}
+
+[popover-trigger] {
+    inline-size: fit-content;
+}
+
+[popover] {
+    position-anchor: --popover;
+    position: fixed;
+    z-index: 101;
+    background: var(--popover);
+    border-radius: var(--spacing-sm);
+
+    &:popover-open,
+    &[open] {
+        display: grid;
+        top: calc(anchor(bottom) + var(--spacing-xs));
+        opacity: 1;
+
+        @starting-style {
+            opacity: 0;
+            top: calc(anchor(bottom) + var(--spacing));
+        }
+    }
+
+    opacity: 0;
+    top: calc(anchor(bottom) + var(--spacing-xs));
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block;
+    margin: initial;
+    transition: opacity;
+    transition-duration: var(--animation-speed-fast);
+    transition-timing-function: var(--ease-in-out);
+    transition-behavior: allow-discrete;
+
+    &[data-state='open'] {
+        opacity: 1;
+
+        @starting-style {
+            opacity: 0;
+        }
+    }
+
+    &[data-state='closed'] {
+        opacity: 0;
+        transition-duration: var(--animation-speed-normal);
+    }
+}
+
+
+[dialog] {
+    position: fixed;
+    inset: 0;
+}
+
+[overlay] {
+    inset: 0;
+    opacity: 0;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: var(--color-black);
+    animation: fade-in-dialog;
+    transition: opacity linear;
+    transition-duration: var(--animation-speed-fast);
+    transition-timing-function: var(--ease-in-out);
+
+
+    &[show]:not([closing]) {
+        opacity: 0.2;
+        pointer-events: all;
+        z-index: 100;
+
+        @starting-style {
+            opacity: 0;
+        }
+    }
+}
+
+@keyframes fade-in-dialog {
+    from {
+        opacity: 0
+    }
+
+    to {
+        opacity: 0.5
+    }
+}
+
+[dialog-container] {
+    opacity: 0;
+    visibility: hidden;
+    position: relative;
+    inline-size: var(--container-lg);
+    top: 50%;
+    left: 50%;
+    border-width: 1px;
+    border-radius: var(--spacing-xs);
+    transform: translateX(-50%) translateY(-50%);
+    transition: opacity linear;
+    transition-duration: var(--animation-speed-normal);
+    transition-timing-function: var(--ease-in-out);
+
+    &[show] {
+        opacity: 1;
+        visibility: visible;
+
+        @starting-style {
+            opacity: 0;
+            visibility: hidden;
+        }
+    }
+}
+
+[sheet-container], [dialog-container] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing);
+    background: var(--surface-3);
+    padding: var(--spacing-lg);
+    z-index: 101;
+}
+
+[sheet-container] {
+    opacity: 0;
+    position: fixed;
+    border-radius: var(--spacing);
+    corner-shape: squircle;
+    overflow: hidden;
+    transition: transform var(--animation-speed-normal) var(--ease-in-out), opacity var(--animation-speed-normal) var(--ease-in-out);
+    transition-behavior: allow-discrete;
+
+    &[side='right'] {
+        inset: calc(var(--spacing) / 2) calc(var(--spacing) / 2) calc(var(--spacing) / 2) auto;
+        block-size: calc(100vh - var(--spacing));
+        inline-size: var(--container-lg);
+        max-inline-size: 100vw;
+        transform: translateX(100%);
+    }
+
+    &[side='left'] {
+        inset: calc(var(--spacing) / 2) auto calc(var(--spacing) / 2) calc(var(--spacing) / 2);
+        block-size: calc(100vh - var(--spacing));
+        inline-size: var(--container-lg);
+        max-inline-size: 100vw;
+        transform: translateX(-100%);
+    }
+
+    &[side='top'] {
+        inset: calc(var(--spacing) / 2) calc(var(--spacing) / 2) auto calc(var(--spacing) / 2);
+        block-size: var(--container-sm);
+        inline-size: calc(100vw - var(--spacing));
+        max-inline-size: 100vw;
+        transform: translateY(-100%);
+    }
+
+    &[side='bottom'] {
+        inset: auto calc(var(--spacing) / 2) calc(var(--spacing) / 2) calc(var(--spacing) / 2);
+        block-size: var(--container-sm);
+        inline-size: calc(100vw - var(--spacing));
+        max-inline-size: 100vw;
+        transform: translateY(100%);
+    }
+
+    &[show] {
+        opacity: 1;
+
+        &[side='right'] {
+            transform: translateX(0);
+
+            @starting-style {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        &[side='left'] {
+            transform: translateX(0);
+
+            @starting-style {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        &[side='top'] {
+            transform: translateY(0);
+
+            @starting-style {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        &[side='bottom'] {
+            transform: translateY(0);
+
+            @starting-style {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+        }
+    }
+}
+
+[sheet-header], [dialog-header] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+[sheet-description], [dialog-description] {
+    font-size: var(--ds-font-size, var(--text-sm));
+    line-height: var(--ds-line-height, var(--text-sm--line-height));
+    color: var(--muted-foreground);
+}
+
+[sheet-body], [dialog-body] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+[sheet-footer], [dialog-footer] {
+    display: flex;
+    inline-size: 100%;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing);
+}

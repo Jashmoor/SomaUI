@@ -1,0 +1,266 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\demo\\components\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|solutionrelative:demo\\components\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\demo\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|solutionrelative:demo\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\demo\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|solutionrelative:demo\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\demo\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|solutionrelative:demo\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\soma\\abstract\\basecomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|solutionrelative:soma\\abstract\\basecomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\soma\\abstract\\statecontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|solutionrelative:soma\\abstract\\statecontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\soma\\components\\buttons\\button\\button.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|solutionrelative:soma\\components\\buttons\\button\\button.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\soma\\abstract\\basewithdependentchild.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|solutionrelative:soma\\abstract\\basewithdependentchild.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\soma\\abstract\\basewithchildcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|solutionrelative:soma\\abstract\\basewithchildcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\soma\\somaui.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{73CB7250-5A65-4F01-2503-AC48D0A90D9B}|Soma\\SomaUI.csproj|solutionrelative:soma\\somaui.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|c:\\users\\joseph.cashmore\\source\\repos\\componentlibrary\\source\\demo\\testbench.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{5EDDEE40-4D93-0B19-CF61-F6551F9ED1BA}|Demo\\TestBench.csproj|solutionrelative:demo\\testbench.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 9,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{131369f2-062d-44a2-8671-91ff31efb4f4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{4a9b7e51-aa16-11d0-a8c5-00a0c921a4d2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{fbcae063-e2c0-4ab1-a516-996ea3dafb72}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{c9c0ae26-aa77-11d2-b3f0-0000f87570ee}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Imports.razor",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\Components\\_Imports.razor",
+              "RelativeDocumentMoniker": "Demo\\Components\\_Imports.razor",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\Components\\_Imports.razor",
+              "RelativeToolTip": "Demo\\Components\\_Imports.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-11-07T12:35:36.878Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Home.razor",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\Components\\Pages\\Home.razor",
+              "RelativeDocumentMoniker": "Demo\\Components\\Pages\\Home.razor",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\Components\\Pages\\Home.razor",
+              "RelativeToolTip": "Demo\\Components\\Pages\\Home.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-11-07T12:34:58.321Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "App.razor",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\Components\\App.razor",
+              "RelativeDocumentMoniker": "Demo\\Components\\App.razor",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\Components\\App.razor",
+              "RelativeToolTip": "Demo\\Components\\App.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-11-07T12:34:38.1Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Button.razor.cs",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Components\\Buttons\\Button\\Button.razor.cs",
+              "RelativeDocumentMoniker": "Soma\\Components\\Buttons\\Button\\Button.razor.cs",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Components\\Buttons\\Button\\Button.razor.cs",
+              "RelativeToolTip": "Soma\\Components\\Buttons\\Button\\Button.razor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-07T12:32:40.169Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "StateContext.cs",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Abstract\\StateContext.cs",
+              "RelativeDocumentMoniker": "Soma\\Abstract\\StateContext.cs",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Abstract\\StateContext.cs",
+              "RelativeToolTip": "Soma\\Abstract\\StateContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEQAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-07T12:31:10.194Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "BaseWithDependentChild.cs",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Abstract\\BaseWithDependentChild.cs",
+              "RelativeDocumentMoniker": "Soma\\Abstract\\BaseWithDependentChild.cs",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Abstract\\BaseWithDependentChild.cs",
+              "RelativeToolTip": "Soma\\Abstract\\BaseWithDependentChild.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-07T12:29:18.827Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "BaseWithChildComponent.cs",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Abstract\\BaseWithChildComponent.cs",
+              "RelativeDocumentMoniker": "Soma\\Abstract\\BaseWithChildComponent.cs",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Abstract\\BaseWithChildComponent.cs",
+              "RelativeToolTip": "Soma\\Abstract\\BaseWithChildComponent.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-07T12:29:14.297Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "BaseComponent.cs",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Abstract\\BaseComponent.cs",
+              "RelativeDocumentMoniker": "Soma\\Abstract\\BaseComponent.cs",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\Abstract\\BaseComponent.cs",
+              "RelativeToolTip": "Soma\\Abstract\\BaseComponent.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-07T12:22:32.391Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "SomaUI",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\SomaUI.csproj",
+              "RelativeDocumentMoniker": "Soma\\SomaUI.csproj",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Soma\\SomaUI.csproj",
+              "RelativeToolTip": "Soma\\SomaUI.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-11-07T12:20:54.263Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:3:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\Program.cs",
+              "RelativeDocumentMoniker": "Demo\\Program.cs",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\Program.cs",
+              "RelativeToolTip": "Demo\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-07T12:20:29.959Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "TestBench",
+              "DocumentMoniker": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\TestBench.csproj",
+              "RelativeDocumentMoniker": "Demo\\TestBench.csproj",
+              "ToolTip": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\TestBench.csproj",
+              "RelativeToolTip": "Demo\\TestBench.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-11-07T12:20:12.014Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{74946827-37a0-11d2-a273-00c04f8ef4ff}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{4a8466fe-5a05-4f81-ad45-7d7c1316817e}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{9a7cebbb-dc5c-4986-bc49-962da46aa506}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{a975660a-81e4-4830-aa25-1b824c3bf732}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+﻿@namespace SomaUI
+@inherits BaseComponent
+
+<button chip @attributes="Attributes" disabled="@Disabled" round="@Round" fill="@Fill" @onclick="HandleOnClick">
+    @if (Prefix is RenderFragment prefix)
+    {
+        @prefix
+    }
+    <span>@Content</span>
+    @if (Suffix is RenderFragment suffix)
+    {
+        @suffix
+    }
+</button>
+

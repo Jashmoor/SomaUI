@@ -1,0 +1,17 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+@if (IsSelected)
+{
+    <div role="tabpanel" tabs-content @attributes="Attributes" animate fade-in slow>
+        @ChildContent
+    </div>
+}
+
+@code {
+    [CascadingParameter] public Tabs? Parent { get; set; }
+
+    [Parameter, EditorRequired] public string Value { get; set; } = default!;
+
+    private bool IsSelected => Parent?.Selected == Value;
+}

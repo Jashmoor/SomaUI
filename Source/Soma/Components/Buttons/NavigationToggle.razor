@@ -1,0 +1,14 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div @onclick="HandleClick">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter(Name = "__application-context")] 
+    internal ApplicationContext ApplicationContext { get; set; } = default!;
+
+    private async Task HandleClick()
+        => await InvokeAsync(() => ApplicationContext.ToggleNavigation());
+}

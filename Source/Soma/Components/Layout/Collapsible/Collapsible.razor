@@ -1,0 +1,16 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<details details>
+    <summary>
+        @Title
+    </summary>
+    <div details-content>
+        @ChildContent
+    </div>
+</details>
+
+
+@code {
+    [Parameter] public string? Title { get; set; }
+}

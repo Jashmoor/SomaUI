@@ -1,0 +1,24 @@
+﻿@namespace SomaUI
+
+<CascadingValue Value="this" IsFixed="true">
+    @Animation
+    <AnimationDefer>
+        @Content
+    </AnimationDefer>
+</CascadingValue>
+
+
+@code {
+    [Parameter] public RenderFragment Animation { get; set; } = default!;
+    [Parameter] public RenderFragment Content { get; set; } = default!;
+
+    internal AnimationBase? Current;
+
+    internal void RegisterAnimation(AnimationBase current) {
+        Current = current;
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override bool ShouldRender()
+        => Current is not null;
+}

@@ -1,0 +1,22 @@
+﻿@namespace SomaUI.Tracing
+
+@if (string.IsNullOrEmpty(Part.Text))
+{
+    <TraceLine Status="Part.IsStreaming ? TraceStatus.Running : TraceStatus.None"><TraceTitle>Thinking</TraceTitle></TraceLine>
+}
+else
+{
+    <TraceCollapsible Open="@(_userOpen ?? Part.IsStreaming)" OpenChanged="v => _userOpen = v">
+        <TraceCollapsibleTrigger>
+            <TraceLine Status="Part.IsStreaming ? TraceStatus.Running : TraceStatus.None">
+                <TraceTitle>@(Part.IsStreaming ? "Thinking" : "Thought")</TraceTitle>
+            </TraceLine>
+        </TraceCollapsibleTrigger>
+        <TraceCollapsibleContent>@Part.Text</TraceCollapsibleContent>
+    </TraceCollapsible>
+}
+
+@code {
+    [Parameter, EditorRequired] public ReasoningPart Part { get; set; } = default!;
+    private bool? _userOpen;
+}

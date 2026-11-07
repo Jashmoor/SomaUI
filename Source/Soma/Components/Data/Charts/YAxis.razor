@@ -1,0 +1,76 @@
+﻿@namespace SomaUI
+@using System.Globalization
+
+@if (context != null && (context.YBandScale != null || context.YScale != null))
+{
+    <g class="chart-yaxis">
+        @if (AxisLine)
+        {
+            <line x1="@F(context.PlotLeft)" y1="@F(context.PlotTop)"
+                  x2="@F(context.PlotLeft)" y2="@F(context.PlotBottom)"
+                  stroke="currentColor" stroke-opacity="0.2" />
+        }
+
+        @if (context.YBandScale != null)
+        {
+            @foreach (var cat in context.YBandScale.Domain)
+            {
+                var y = context.YBandScale.ScaleCenter(cat);
+                var label = TickFormatter != null ? TickFormatter(cat) : cat;
+
+                @if (TickLine)
+                {
+                    <line x1="@F(context.PlotLeft - 6)" y1="@F(y)"
+                          x2="@F(context.PlotLeft)" y2="@F(y)"
+                          stroke="currentColor" stroke-opacity="0.2" />
+                }
+
+                @SvgText(F(context.PlotLeft - TickMargin), F(y), label)
+            }
+        }
+        else if (context.YScale != null)
+        {
+            @foreach (var tick in context.YScale.Ticks(TickCount))
+            {
+                var y = context.YScale.Scale(tick);
+                var label = TickFormatter != null
+                    ? TickFormatter(tick.ToString(CultureInfo.InvariantCulture))
+                    : tick.ToString("G", CultureInfo.InvariantCulture);
+
+                @if (TickLine)
+                {
+                    <line x1="@F(context.PlotLeft - 6)" y1="@F(y)"
+                          x2="@F(context.PlotLeft)" y2="@F(y)"
+                          stroke="currentColor" stroke-opacity="0.2" />
+                }
+
+                @SvgText(F(context.PlotLeft - TickMargin), F(y), label)
+            }
+        }
+    </g>
+}
+
+@code {
+    [CascadingParameter(Name = "_context")]
+    private ChartContext? context { get; set; }
+
+    [Parameter]
+    public bool TickLine { get; set; } = true;
+
+    [Parameter]
+    public bool AxisLine { get; set; } = true;
+
+    [Parameter]
+    public double TickMargin { get; set; } = 10;
+
+    [Parameter]
+    public int TickCount { get; set; } = 5;
+
+    [Parameter]
+    public Func<string, string>? TickFormatter { get; set; }
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+
+    private static MarkupString SvgText(string x, string y, string content) =>
+        new($"<text x=\"{x}\" y=\"{y}\" text-anchor=\"end\" dominant-baseline=\"central\" fill=\"currentColor\" opacity=\"0.5\" font-size=\"12\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+}

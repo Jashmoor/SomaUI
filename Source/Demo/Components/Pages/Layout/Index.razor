@@ -1,0 +1,277 @@
+﻿@page "/layout"
+@rendermode InteractiveServer
+
+<Container>
+
+    <FeatureContainer>
+        <GridItem class="s4 m4 l4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>One</CardTitle>
+                </CardHeader>
+            </Card>
+        </GridItem>
+        <GridItem class="s4 m4 l4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Two</CardTitle>
+                </CardHeader>
+            </Card>
+        </GridItem>
+        <GridItem class="s4 m4 l4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Three</CardTitle>
+                </CardHeader>
+            </Card>
+        </GridItem>
+        <GridItem class="s4 m4 l4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Four</CardTitle>
+                </CardHeader>
+            </Card>
+        </GridItem>
+    </FeatureContainer>
+
+    <GridLayout>
+        <GridItem class="s4 m4 l6">
+            <FeatureContainer>
+                <GridItem class="s4 m4 l4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Five</CardTitle>
+                        </CardHeader>
+                    </Card>
+                </GridItem>
+                <GridItem class="s4 m4 l4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Six</CardTitle>
+                        </CardHeader>
+                    </Card>
+                </GridItem>
+                <GridItem class="s4 m4 l4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Seven</CardTitle>
+                        </CardHeader>
+                    </Card>
+                </GridItem>
+                <GridItem class="s4 m4 l4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Eight</CardTitle>
+                        </CardHeader>
+                    </Card>
+                </GridItem>
+            </FeatureContainer>
+        </GridItem>
+        <GridItem class="s4 m3 l6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Nine</CardTitle>
+                </CardHeader>
+            </Card>
+        </GridItem>
+        <GridItem class="s3 m6 l3">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Ten</CardTitle>
+                </CardHeader>
+            </Card>
+        </GridItem>
+        <GridItem class="s1 m4 l4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Eleven</CardTitle>
+                </CardHeader>
+            </Card>
+        </GridItem>
+        <GridItem class="s1 m4 l4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Twelve</CardTitle>
+                </CardHeader>
+            </Card>
+        </GridItem>
+    </GridLayout>
+    <Tabs Default="account">
+        <TabsList>
+            <TabsTrigger Value="account">Account</TabsTrigger>
+            <TabsTrigger Value="billing">Billing</TabsTrigger>
+            <TabsTrigger Value="layout">Settings</TabsTrigger>
+            <TabsTrigger Value="actions">Actions</TabsTrigger>
+        </TabsList>
+        <TabsContent Value="account">
+            <p>Account</p>
+        </TabsContent>
+        <TabsContent Value="billing">
+            <p>Billing</p>
+        </TabsContent>
+        <TabsContent Value="layout">
+            <p>Settings</p>
+        </TabsContent>
+        <TabsContent Value="actions">
+            <p>Actions</p>
+        </TabsContent>
+    </Tabs>
+
+    <Tabs Default="account" Primary="true">
+        <TabsList>
+            <TabsTrigger Value="account">Account</TabsTrigger>
+            <TabsTrigger Value="billing">Billing</TabsTrigger>
+            <TabsTrigger Value="layout">Settings</TabsTrigger>
+            <TabsTrigger Value="actions">Actions</TabsTrigger>
+        </TabsList>
+        <TabsContent Value="account">
+            <p>Account</p>
+        </TabsContent>
+        <TabsContent Value="billing">
+            <p>Billing</p>
+        </TabsContent>
+        <TabsContent Value="layout">
+            <p>Settings</p>
+        </TabsContent>
+        <TabsContent Value="actions">
+            <p>Actions</p>
+        </TabsContent>
+    </Tabs>
+
+    <Timeline Value="2">
+        <TimelineItem Value="1">
+            <TimelineHeader>
+                <TimelineTitle>Title</TimelineTitle>
+                <TimelineTime>Description</TimelineTime>
+                <TimelineActions>
+                    <Button Size="ButtonSize.Icon">x</Button>
+                </TimelineActions>
+            </TimelineHeader>
+            <TimelineContent>
+                Some content
+            </TimelineContent>
+        </TimelineItem>
+        <TimelineItem Value="2">
+            <TimelineHeader>
+                <TimelineTitle>Title</TimelineTitle>
+                <TimelineTime>Description</TimelineTime>
+            </TimelineHeader>
+            <TimelineContent>
+                Some content
+            </TimelineContent>
+        </TimelineItem>
+
+        <TimelineItem Value="3">
+            <TimelineHeader>
+                <TimelineTitle>Title</TimelineTitle>
+                <TimelineTime>Description</TimelineTime>
+            </TimelineHeader>
+            <TimelineContent>
+                Some content
+            </TimelineContent>
+        </TimelineItem>
+    </Timeline>
+
+
+    <Timeline>
+        <TimelineItem Title="Timeline" Description="21/09/2023">
+            <TimelineHeader>
+                <TimelineTitle>Date</TimelineTitle>
+            </TimelineHeader>
+            <TimelineContent>
+                <ScrollArea>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Custom Aspect Ratios</CardTitle>
+                            <CardDescription>Content within can use this wrapper to preserve its aspect ratio, regardless of the screen size</CardDescription>
+
+                        </CardHeader>
+                        <CardContent>
+                            <FieldSet style="padding-inline: 0;">
+                                <Field T="double" For="() => Custom">
+                                    <FieldLabel>Select</FieldLabel>
+                                    <Select TItem="double" @bind-Value="@Custom">
+                                        <Option Value="1">1 / 1 - Square</Option>
+                                        <Option Value="1.06">Minor Second</Option>
+                                        <Option Value="1.2">Minor Third</Option>
+                                        <Option Value="1.25">Major Third</Option>
+                                        <Option Value="1.33">Perfect Fourth - 4 / 3</Option>
+                                        <Option Value="1.414">Augmented Fourth</Option>
+                                        <Option Value="1.5">Perfect Fifth</Option>
+                                        <Option Value="16.0/9.0" Selected>16 / 9 - Widescreen</Option>
+                                        <Option Value="1.618">Golden</Option>
+                                        <Option Value="21.0/9.0">21 / 9 - Super Widescreen</Option>
+                                        <Option Value="2.71">Euler</Option>
+                                        <Option Value="3.14/1.0">Pie</Option>
+                                    </Select>
+                                </Field>
+                            </FieldSet>
+                            <AspectRatio Ratio="@Custom" style="width: 450px;">
+                                <img src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&amp;dpr=2&amp;q=80" alt="Photo by Drew Beamer" style="height: 100%; max-width: unset; object-fit: cover;">
+                            </AspectRatio>
+                        </CardContent>
+                    </Card>
+                </ScrollArea>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Test Card</CardTitle>
+                    </CardHeader>
+                </Card>
+            </TimelineContent>
+        </TimelineItem>
+        <TimelineItem Title="Timeline" Description="21/09/2023">
+            <IconContent>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m424-296 282-282-56-56-226 226-114-114-56 56 170 170Zm56 216q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" /></svg>
+            </IconContent>
+            <DescriptionContent>
+                <span>Date</span>
+            </DescriptionContent>
+            <BodyContent>
+                <p>dlf ldkls dflsk fsld fsd fsd fsdllksd fsds dlsd fslk sdlkf sd f</p>
+            </BodyContent>
+        </TimelineItem>
+        <TimelineItem>
+            <IconContent>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m424-296 282-282-56-56-226 226-114-114-56 56 170 170Zm56 216q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" /></svg>
+            </IconContent>
+            <BodyContent>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Custom Aspect Ratios</CardTitle>
+                        <CardDescription>Content within can use this wrapper to preserve its aspect ratio, regardless of the screen size</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <FieldSet style="padding-inline: 0;">
+                            <Field T="double" For="() => Custom">
+                                <FieldLabel>Select</FieldLabel>
+                                <Select TItem="double" @bind-Value="@Custom">
+                                    <Option Value="1">1 / 1 - Square</Option>
+                                    <Option Value="1.06">Minor Second</Option>
+                                    <Option Value="1.2">Minor Third</Option>
+                                    <Option Value="1.25">Major Third</Option>
+                                    <Option Value="1.33">Perfect Fourth - 4 / 3</Option>
+                                    <Option Value="1.414">Augmented Fourth</Option>
+                                    <Option Value="1.5">Perfect Fifth</Option>
+                                    <Option Value="16.0/9.0" Selected>16 / 9 - Widescreen</Option>
+                                    <Option Value="1.618">Golden</Option>
+                                    <Option Value="21.0/9.0">21 / 9 - Super Widescreen</Option>
+                                    <Option Value="2.71">Euler</Option>
+                                    <Option Value="3.14/1.0">Pie</Option>
+                                </Select>
+                            </Field>
+                        </FieldSet>
+                        <AspectRatio Ratio="@Custom" style="width: 450px;">
+                            <img src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&amp;dpr=2&amp;q=80" alt="Photo by Drew Beamer" style="height: 100%; max-width: unset; object-fit: cover;">
+                        </AspectRatio>
+                    </CardContent>
+                </Card>
+            </BodyContent>
+        </TimelineItem>
+    </Timeline>
+</Container>
+
+@code {
+    private double Custom = 16.0/9.0;
+
+
+}

@@ -1,0 +1,73 @@
+﻿@namespace SomaUI
+@using System.Globalization
+
+@if (Context != null)
+{
+    <g class="chart-grid">
+        @if (Horizontal && Context.YScale is not null)
+        {
+            @foreach (var tick in Context.YScale.Ticks(TickCount))
+            {
+                var y = Context.YScale.Scale(tick);
+                <line x1="@F(Context.PlotLeft)"
+                      y1="@F(y)"
+                      x2="@F(Context.PlotRight)"
+                      y2="@F(y)"
+                      stroke="var(--outline)"
+                      stroke-opacity="0.1"
+                      stroke-dasharray="@StrokeDasharray" />
+            }
+        }
+        @if (Vertical)
+        {
+            @if (Context.XBandScale != null)
+            {
+                @foreach (var cat in Context.XBandScale.Domain)
+                {
+                    var x = Context.XBandScale.ScaleCenter(cat);
+                    <line x1="@F(x)"
+                          y1="@F(Context.PlotTop)"
+                          x2="@F(x)"
+                          y2="@F(Context.PlotBottom)"
+                          stroke="var(--outline)"
+                          stroke-opacity="0.1"
+                          stroke-dasharray="@StrokeDasharray" />
+                }
+            }
+            else if (Context.XLinearScale != null)
+            {
+                var ticks = Context.XLinearScale.Ticks(TickCount);
+                @foreach (var tick in ticks)
+                {
+                    var x = Context.XLinearScale.Scale(tick);
+                    <line x1="@F(x)"
+                          y1="@F(Context.PlotTop)"
+                          x2="@F(x)"
+                          y2="@F(Context.PlotBottom)"
+                          stroke="var(--outline)"
+                          stroke-opacity="0.1"
+                          stroke-dasharray="@StrokeDasharray" />
+                }
+            }
+        }
+    </g>
+}
+
+@code {
+    [CascadingParameter(Name = "_context")]
+    private ChartContext? Context { get; set; }
+
+    [Parameter]
+    public bool Horizontal { get; set; } = true;
+
+    [Parameter]
+    public bool Vertical { get; set; } = false;
+
+    [Parameter]
+    public string? StrokeDasharray { get; set; }
+
+    [Parameter]
+    public int TickCount { get; set; } = 5;
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+}

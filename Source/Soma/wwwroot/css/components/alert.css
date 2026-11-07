@@ -1,0 +1,92 @@
+﻿[alert-wrapper] {
+
+    &[show] {
+        opacity: 1;
+        grid-template-rows: 1fr;
+        visibility: visible;
+
+        @starting-style {
+            display: grid;
+        }
+    }
+
+    opacity: 0;
+    display: grid;
+    visibility: hidden;
+    overflow: hidden;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows, opacity, visibility, display;
+    transition-duration: var(--animation-speed-fast);
+    transition-timing-function: var(--ease-in-out);
+    transition-behavior: allow-discrete;
+    cursor: pointer;
+    inline-size: fit-content;
+
+    & * {
+        cursor: pointer;
+    }
+}
+
+[alert] {
+    opacity: 0;
+    display: flex;
+    min-height: 0;
+    flex-basis: min-content;
+    align-items: center;
+    border-radius: var(--spacing-lg);
+    padding: 0;
+    border-color: var(--_border-color, var(--border));
+    border-width: 1px;
+    border-inline-start-width: var(--spacing-xxs);
+    border-style: solid;
+    gap: var(--spacing-sm);
+    background-color: color-mix(var(--card), var(--_border-color) 10%);
+    transition: background-color, opacity, padding;
+    transition-duration: var(--animation-speed-normal);
+    transition-timing-function: var(--ease-in-out);
+    corner-shape: squircle;
+    inline-size: var(--container-sm);
+    --ds-line-height: 1;
+
+    &[show] {
+        padding: var(--spacing-xxs) var(--spacing-sm);
+        opacity: 1;
+    }
+
+
+    &[data-variant="success"] {
+        --_border-color: var(--success);
+    }
+
+    &[data-variant="warning"] {
+        --_border-color: var(--warning);
+    }
+
+    &[data-variant="information"] {
+        --_border-color: var(--info);
+    }
+
+    &[data-variant="danger"] {
+        --_border-color: var(--error);
+    }
+}
+
+[alert-title] {
+    --ds-font-weight: var(--font-weight-light);
+}
+
+[alert-content] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: 0;
+}
+
+[alert-description] {
+    --ds-font-size: calc(var(--spacing-sm) + 1px);
+    --ds-font-weight: var(--font-weight-normal);
+    --ds-line-height: var(--text-sm--line-height);
+    --ds-letter-spacing: var(--tracking-tight);
+    color: var(--muted-foreground);
+}

@@ -1,0 +1,28 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<TableRow @onclick="Toggle">
+    <TableCell colspan="@Colspan">
+        <div style="display: flex; gap: var(--spacing); justify-content: flex-start; align-items: center;">
+            <Button>View</Button>
+            @ChildContent
+        </div>
+    </TableCell>
+</TableRow>
+
+@if (Open)
+{
+    @Details
+}
+
+@code {
+    [Parameter] public RenderFragment Details { get; set; } = default!;
+    [Parameter] public int Colspan { get; set; } = 1;
+
+    private bool Open { get; set; } = false;
+
+    private void Toggle() {
+        Open = !Open;
+        StateHasChanged();
+    }
+}

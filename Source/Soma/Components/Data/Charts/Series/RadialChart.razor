@@ -1,0 +1,150 @@
+﻿@namespace SomaUI
+@inherits ChartComponent
+@using System.Globalization
+
+@if (Context != null && Context.Data.Count > 0)
+{
+    <g class="chart-radial-series" @key="@($"radial-{DataKey}-{Context.__Version}")">
+        @{
+            var cx = Context.Width / 2;
+            var cy = Context.Height / 2;
+            var segments = BuildSegments();
+            Context.IsPieStyle = true;
+            Context.ValueDataKey = DataKey;
+            Context.NameDataKey = NameKey ?? Context.XDataKey ?? "name";
+        }
+
+        @if (ShowBackground)
+        {
+            @foreach (var seg in segments)
+            {
+                var bgPath = ArcGenerator.Arc(cx, cy, seg.OuterR, seg.InnerR,
+                    ChartMath.ToRadians(StartAngle), ChartMath.ToRadians(EndAngle));
+                <path d="@bgPath"
+                      fill="currentColor"
+                      opacity="0.1" />
+            }
+        }
+
+        @foreach (var seg in segments)
+        {
+            var sweepAngle = (seg.Value / MaxValue) * ChartMath.ToRadians(EndAngle - StartAngle);
+            var startRad = ChartMath.ToRadians(StartAngle);
+            var endRad = startRad + sweepAngle;
+
+            var pathD = ArcGenerator.Arc(cx, cy, seg.OuterR, seg.InnerR, startRad, endRad);
+            var isActive = Context.ActiveIndex == seg.Index;
+            var animClass = Animate ? "chart-pie-animate" : "";
+            var animDelay = Animate ? $"animation-delay: {seg.Index * 0.15}s;" : "";
+            var originStyle = $"transform-origin: {F(cx)}px {F(cy)}px;";
+
+            var (centX, centY) = ArcGenerator.Centroid(cx, cy, seg.OuterR, seg.InnerR,
+                startRad, endRad);
+
+            <path d="@pathD"
+                  fill="@seg.Fill"
+                  stroke="none"
+                  opacity="@(isActive ? "1" : "0.9")"
+                  class="@($"transition-opacity duration-200 {animClass}")"
+                  style="@($"{originStyle}{animDelay}")"
+                  @onmouseenter="() => Context.SetActiveIndex(seg.Index, centX, centY)"
+                  @onmouseleave="() => Context.ClearActiveIndex()" />
+        }
+
+        @if (CenterContent != null)
+        {
+            <foreignObject x="@F(cx - InnerRadius)" y="@F(cy - InnerRadius)"
+                           width="@F(InnerRadius * 2)" height="@F(InnerRadius * 2)">
+                <div xmlns="http://www.w3.org/1999/xhtml"
+                     style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%; text-align: center;">
+                    @CenterContent
+                </div>
+            </foreignObject>
+        }
+    </g>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string DataKey { get; set; } = "";
+
+    [Parameter]
+    public string? NameKey { get; set; }
+
+    [Parameter]
+    public double OuterRadius { get; set; } = 120;
+
+    [Parameter]
+    public double InnerRadius { get; set; } = 80;
+
+    [Parameter]
+    public double StartAngle { get; set; } = -90;
+
+    [Parameter]
+    public double EndAngle { get; set; } = 270;
+
+    [Parameter]
+    public double MaxValue { get; set; } = 300;
+
+    [Parameter]
+    public bool ShowBackground { get; set; } = true;
+
+    [Parameter]
+    public double BarGap { get; set; } = 4;
+
+    [Parameter]
+    public RenderFragment? CenterContent { get; set; }
+
+    [Parameter]
+    public bool Animate { get; set; } = true;
+
+    private List<RadialSegment> BuildSegments() {
+        if (Context == null) return [];
+
+        var data = Context.Data;
+        var nameKey = NameKey ?? Context.XDataKey ?? "name";
+        var segments = new List<RadialSegment>();
+
+        var barThickness = (OuterRadius - InnerRadius - (data.Count - 1) * BarGap) / data.Count;
+        if (barThickness < 2) barThickness = 2;
+
+        for (int i = 0; i < data.Count; i++)
+        {
+            var name = DataAccessor.GetString(data[i], nameKey);
+            var value = DataAccessor.GetDouble(data[i], DataKey);
+
+            var fill = DataAccessor.GetString(data[i], "fill");
+            if (string.IsNullOrEmpty(fill))
+            {
+                fill = Context.Config.TryGetValue(name, out var entry) && entry.Color != null
+                    ? entry.Color
+                    : $"var(--chart-{i})";
+            }
+
+            var outerR = OuterRadius - i * (barThickness + BarGap);
+            var innerR = outerR - barThickness;
+
+            segments.Add(new RadialSegment {
+                Index = i,
+                Name = name,
+                Value = value,
+                OuterR = outerR,
+                InnerR = innerR,
+                Fill = fill
+            });
+        }
+
+        return segments;
+    }
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+
+    private class RadialSegment {
+        public int Index { get; init; }
+        public string Name { get; init; } = "";
+        public double Value { get; init; }
+        public double OuterR { get; init; }
+        public double InnerR { get; init; }
+        public string Fill { get; init; } = "";
+    }
+}

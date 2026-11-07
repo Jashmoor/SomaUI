@@ -1,0 +1,19 @@
+﻿@namespace SomaUI
+
+@Heading
+
+@code {
+    [Parameter] public string As { get; set; } = "h5";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> Attributes { get; set; } = [];
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+
+    public RenderFragment Heading => builder => {
+        builder.OpenElement(0, As);
+        builder.AddAttribute(1, "alert-title", "");
+        builder.AddAttribute(2, "class", Class);
+        builder.AddMultipleAttributes(3, Attributes);
+        builder.AddContent(4, ChildContent);
+        builder.CloseElement();
+    };
+}

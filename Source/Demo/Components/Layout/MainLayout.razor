@@ -1,0 +1,32 @@
+﻿@inherits LayoutComponentBase
+
+<ApplicationState>
+    <NavigationRail>
+
+    </NavigationRail>
+
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <Main>
+        <Tabs UrlControlled Default="home">
+            <TabsList>
+                <TabsTrigger Value="">Home</TabsTrigger>
+                <TabsTrigger Value="charts">Charts</TabsTrigger>
+                <TabsTrigger Value="layout">Layout</TabsTrigger>
+                <TabsTrigger Value="data">Data</TabsTrigger>
+            </TabsList>
+        </Tabs>
+        @Body
+    </Main>
+    <DialogHost />
+    <ToastDisplay />
+    <FloatingHost />
+    <SheetHost />
+    <div id="blazor-error-ui" data-nosnippet>
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">🗙</span>
+    </div>
+</ApplicationState>

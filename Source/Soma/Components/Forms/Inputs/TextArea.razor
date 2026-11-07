@@ -1,0 +1,57 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Forms
+@implements IAsyncDisposable
+@inherits FormComponent<string>
+
+<textarea @ref="Element"
+          id="@(FieldContext?.Id ?? UniqueID)"
+          @attributes="Attributes"
+          disabled="@Disabled"
+          placeholder="@Placholder"
+          @bind:get="@Value"
+          @bind:set="UpdateValue"
+          error="@(!EditContext?.IsValid(_Field) == true)"
+          />
+
+@code {
+    internal InputValidation? Validation;
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        Validation = new(this, () => EditContext, () => true, () => FieldContext?.Id ?? UniqueID!);
+    }
+
+    protected override void OnParametersSet() {
+        base.OnParametersSet();
+
+        if (Validation is not null)
+            Validation.OnParametersSet((For ?? ValueExpression));
+    }
+
+    private async Task UpdateValue(string? newValue) {
+        Value = newValue;
+        await ValueChanged.InvokeAsync(newValue);
+        if (Validation is not null)
+            await Validation.NotifyFieldChanged();
+    }
+
+    internal override void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) {
+        if (Validation is not null)
+        {
+            InvokeAsync(async () => {
+                var render = await Validation.HandleValidationStateChange();
+                if (render)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+    }
+
+    public override async ValueTask DisposeAsync() {
+        if (Validation is not null)
+            await Validation.DisposeAsync();
+
+        await base.DisposeAsync();
+    }
+}

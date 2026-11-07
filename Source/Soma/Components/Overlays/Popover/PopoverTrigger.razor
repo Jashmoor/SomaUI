@@ -1,0 +1,24 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div @ref="Element"
+     popover-trigger
+     @onclick="HandleClick"
+     @onmouseenter="HandleMouseover">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter] public Popover? Parent { get; set; } = default!;
+    [Parameter] public bool Hoverable { get; set; }
+
+    private async Task HandleClick() {
+        if (Parent != null)
+            await Parent.Toggle();
+    }
+
+    private async Task HandleMouseover() {
+        if (Hoverable)
+            await HandleClick();
+    }
+}

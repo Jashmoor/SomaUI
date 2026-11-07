@@ -1,0 +1,68 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Forms
+@inherits FormComponent<string>
+
+<input @ref="Element"
+       @bind:get="@Value"
+       @bind:set="SetValue"
+       @bind:event="oninput"
+       id="@(FieldContext?.Id ?? UniqueID)"
+       placeholder="@Placholder"
+       type="text"
+       error="@(!EditContext?.IsValid(_Field) == true)" />
+
+@code {
+    [Parameter] public bool Trim { get; set; } = false;
+
+    private InputValidation? Validation;
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        Validation = new(this, () => EditContext, () => true, () => FieldContext?.Id ?? UniqueID!);
+    }
+
+    protected override void OnParametersSet() {
+        base.OnParametersSet();
+
+        if (Validation is not null)
+            Validation.OnParametersSet((For ?? ValueExpression));
+    }
+
+    protected virtual async Task SetValue(string? value) {
+        await UpdateValue(value, Trim);
+    }
+
+    private async Task UpdateValue(string? value, bool trim) {
+        var newValue = trim
+            ? $"{value}".Trim()
+            : $"{value}";
+
+        if (string.Equals(Value, newValue, StringComparison.Ordinal))
+            return;
+
+        Value = newValue;
+        await ValueChanged.InvokeAsync(newValue);
+        if (Validation is not null)
+            await Validation.NotifyFieldChanged();
+    }
+
+    internal override void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) {
+        if (Validation is not null)
+        {
+            InvokeAsync(async () => {
+                var render = await Validation.HandleValidationStateChange();
+                if (render)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+    }
+
+    public override async ValueTask DisposeAsync() {
+        if (Validation is not null)
+            await Validation.DisposeAsync();
+
+        await base.DisposeAsync();
+    }
+}

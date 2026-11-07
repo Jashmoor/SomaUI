@@ -1,0 +1,26 @@
+﻿@namespace Dialogs
+
+<DialogHeader>
+    <DialogTitle>@Context.Reference.Options.Title</DialogTitle>
+    <DialogDescription>@Context.Reference.Options.Description</DialogDescription>
+</DialogHeader>
+<DialogBody>
+    @Context.Reference.Content
+</DialogBody>
+<DialogFooter>
+    <Button OnClick="Confirmation">Confirm</Button>
+    <Button OnClick="Cancellation">Cancel</Button>
+</DialogFooter>
+
+@code {
+    [CascadingParameter] public DialogContext Context { get; set; } = default!;
+    [Parameter] public Button Data { get; set; } = default!;
+
+    private async Task Confirmation() {
+        Context.Close(true);
+    }
+
+    private async Task Cancellation() {
+        Context.Close(false);
+    }
+}

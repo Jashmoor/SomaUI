@@ -1,0 +1,121 @@
+﻿@namespace SomaUI
+@using System.Globalization
+
+@if (context != null)
+{
+    @ChildContent
+    @if (context.XBandScale != null && context.YScale != null)
+    {
+        var categories = context.XBandScale.Domain;
+        var halfBand = categories.Count > 1
+            ? (context.PlotRight - context.PlotLeft) / categories.Count / 2.0
+            : (context.PlotRight - context.PlotLeft) / 2.0;
+
+        @for (int i = 0; i < categories.Count; i++)
+        {
+            var idx = i;
+            var cat = categories[i];
+            var cx = context.XBandScale.ScaleCenter(cat);
+            var zoneX = cx - halfBand;
+            var zoneW = halfBand * 2;
+
+            double topY = context.PlotBottom;
+            if (idx < context.Data.Count)
+            {
+                foreach (var key in context.Config.Keys)
+                {
+                    var val = DataAccessor.GetDouble(context.Data[idx], key);
+                    var y = context.YScale.Scale(val);
+                    if (y < topY) topY = y;
+                }
+            }
+
+            <rect x="@F(Math.Max(zoneX, context.PlotLeft))"
+                  y="@F(context.PlotTop)"
+                  width="@F(Math.Min(zoneW, context.PlotRight - Math.Max(zoneX, context.PlotLeft)))"
+                  height="@F(context.PlotHeight)"
+                  fill="transparent"
+                  @onmouseenter="@(() => context.SetActiveIndex(idx, cx, topY))" />
+        }
+    }
+}
+
+@code {
+    [CascadingParameter(Name = "_context")]
+    private ChartContext? context { get; set; }
+
+    [CascadingParameter]
+    internal ChartDisplay Chart { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<object> Data { get; set; } = [];
+
+    [Parameter]
+    public double? Width { get; set; }
+
+    [Parameter]
+    public double? Height { get; set; }
+
+    [Parameter]
+    public ChartMargin? Margin { get; set; }
+
+    [Parameter]
+    public string? XDataKey { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private IReadOnlyList<object>? _previousData;
+
+    protected override void OnParametersSet() {
+        if (context == null) return;
+
+        if (_previousData != Data)
+        {
+            context.__Version++;
+            _previousData = Data;
+        }
+
+        var margin = Margin ?? new ChartMargin();
+        context.Width = Chart?.Width ?? 0;
+        context.Height = Chart?.Height ?? 0;
+        context.Margin = margin;
+        context.Data = Data;
+        context.XDataKey = XDataKey;
+
+        BuildScales();
+    }
+
+    private void BuildScales() {
+        if (context == null || Data.Count == 0) return;
+
+        var xKey = context.XDataKey ?? XDataKey ?? "name";
+        var categories = DataAccessor.GetAllStrings(Data, xKey);
+        context.XBandScale = new ScaleBand(categories, context.PlotLeft, context.PlotRight, 0, 0);
+        context.XDataKey = xKey;
+
+        double yMin = 0, yMax = 0;
+        foreach (var key in context.Config.Keys)
+        {
+            var values = DataAccessor.GetAllDoubles(Data, key);
+            foreach (var v in values)
+            {
+                if (v > yMax) yMax = v;
+                if (v < yMin) yMin = v;
+            }
+        }
+
+        var (niceMin, niceMax) = ChartMath.NiceExtent(yMin, yMax);
+        context.YScale = new ScaleLinear(niceMin, niceMax, context.PlotBottom, context.PlotTop);
+    }
+
+    private void HandleMouseLeave(MouseEventArgs e) => context?.ClearActiveIndex();
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+}

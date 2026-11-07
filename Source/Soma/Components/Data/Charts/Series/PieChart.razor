@@ -1,0 +1,55 @@
+﻿@namespace SomaUI
+@using System.Globalization
+
+@if (Context != null)
+{
+    <svg viewBox="@ViewBox"
+         preserveAspectRatio="xMidYMid meet"
+         @onmouseleave="HandleMouseLeave"
+         @attributes="AdditionalAttributes">
+        @ChildContent
+    </svg>
+}
+
+@code {
+    [CascadingParameter]
+    private ChartContext? Context { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<object> Data { get; set; } = [];
+
+    [Parameter]
+    public double Width { get; set; } = 300;
+
+    [Parameter]
+    public double Height { get; set; } = 300;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string ViewBox => $"0 0 {F(Width)} {F(Height)}";
+
+    private IReadOnlyList<object>? _previousData;
+
+    protected override void OnParametersSet() {
+        if (Context == null) return;
+        if (_previousData != Data)
+        {
+            Context.__Version++;
+            _previousData = Data;
+        }
+        Context.Width = Width;
+        Context.Height = Height;
+        Context.Data = Data;
+    }
+
+    private void HandleMouseLeave(MouseEventArgs args) => Context?.ClearActiveIndex();
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+}

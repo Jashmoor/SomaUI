@@ -1,0 +1,124 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+@implements IAsyncDisposable
+
+<div alert-wrapper show="@(!Dismissed)" closed="@Dismissed">
+    <div role="alert"
+         alert
+         show="@(!Dismissed)"
+         data-variant="@Variant.ToString().ToLower()"
+         @onmouseenter="HandleMouseEnter"
+         @onmouseleave="HandleMouseLeave"
+         @onclick="HandleDismiss"
+         @attributes="Attributes">
+        @Icon
+        <div alert-content>
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment Icon { get; set; } = default!;
+    [Parameter] public int? AutoDismiss { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public AlertVariant Variant { get; set; } = AlertVariant.Default;
+
+    private CancellationTokenSource? Dismiss;
+    private TaskCompletionSource? Signal;
+    private int Remaining;
+    private bool Dismissed;
+    private bool Paused;
+
+    protected override void OnAfterRender(bool firstRender) {
+        if (firstRender && AutoDismiss.HasValue)
+        {
+            Remaining = AutoDismiss.Value;
+            _ = RunAutoDismiss();
+        }
+    }
+
+    private async Task RunAutoDismiss() {
+        while (Remaining > 0 && !Dismissed)
+        {
+            Dismiss?.Dispose();
+            Dismiss = new CancellationTokenSource();
+            var segmentStart = DateTime.UtcNow;
+
+            try
+            {
+                await Task.Delay(Remaining, Dismiss.Token);
+                Remaining = 0;
+                await HandleDismiss();
+            }
+            catch (OperationCanceledException)
+            {
+                var elapsed = (int)(DateTime.UtcNow - segmentStart).TotalMilliseconds;
+                Remaining = Math.Max(0, Remaining - elapsed);
+
+                if (Dismissed)
+                    return;
+
+                var tcs = new TaskCompletionSource();
+                Signal = tcs;
+
+                if (!Paused)
+                {
+                    Signal = null;
+                    continue;
+                }
+
+                await tcs.Task;
+                Signal = null;
+
+                if (Dismissed)
+                    return;
+            }
+        }
+
+        if (!Dismissed)
+        {
+            Dismissed = true;
+            await InvokeAsync(async () => {
+                if (OnClose.HasDelegate)
+                    await OnClose.InvokeAsync();
+            });
+        }
+    }
+
+    private void HandleMouseEnter() {
+        if (AutoDismiss.HasValue)
+        {
+            Paused = true;
+            Dismiss?.Cancel();
+        }
+    }
+
+    private void HandleMouseLeave() {
+        if (AutoDismiss.HasValue)
+        {
+            Paused = false;
+            Signal?.TrySetResult();
+        }
+    }
+
+    private async Task HandleDismiss() {
+        Dismissed = true;
+        Dismiss?.Cancel();
+        Signal?.TrySetResult();
+        if (OnClose.HasDelegate)
+            await OnClose.InvokeAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public ValueTask DisposeAsync() {
+        Dismissed = true;
+        Dismiss?.Cancel();
+        Dismiss?.Dispose();
+        Dismiss = null;
+        Signal?.TrySetResult();
+        Signal = null;
+        GC.SuppressFinalize(this);
+        return ValueTask.CompletedTask;
+    }
+}

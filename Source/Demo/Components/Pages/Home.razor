@@ -1,0 +1,704 @@
+﻿@using SomaUI
+@using Dialogs
+@rendermode InteractiveServer
+@page "/"
+
+@code {
+    [Inject] private IToastService ToastService { get; set; } = default!;
+    [Inject] private IPopupService PopupService { get; set; } = default!;
+    [Inject] private DialogService DialogService { get; set; } = default!;
+    [Inject] private SheetService SheetService { get; set; } = default!;
+
+    private string? ToggleValue { get; set; } = "one";
+
+    private async Task OpenSheet(SheetSide? side = null) {
+        var a = await SheetService.ShowAsync<DemoSheet, bool?>(new(), new SheetOptions {
+            Title = "Test",
+            Description = "Description",
+            Side = side ?? SheetSide.Right
+        });
+    }
+
+    private bool StartRunning = false;
+    private async Task TestDelay(CancellationToken token)
+        => await Task.Delay(1000, token);
+
+    private async Task OpenSheetRight()
+        => await OpenSheet();
+    private async Task OpenSheetLeft()
+        => await OpenSheet(SheetSide.Left);
+    private async Task OpenSheetTop()
+        => await OpenSheet(SheetSide.Top);
+    private async Task OpenSheetBottom()
+        => await OpenSheet(SheetSide.Bottom);
+
+    private async Task Confirmation() {
+        var a = await DialogService.ShowAsync<DemoDialog, bool?>(
+            new()
+        );
+        await (a switch {
+            true => ToastService.Promise(
+                async () => await Task.Delay(3000),
+                new ToastPromiseOptions {
+                    Loading = "Uploading Secret Stuff ...",
+                    Success = "Thanks we got it all",
+                }),
+            _ => ToastService.Toast("You declined", ToastType.Default),
+        });
+    }
+
+    private async Task ShowEmpty() {
+        var a = await DialogService.ShowOption();
+    }
+
+    private async Task<bool?> Interrupt()
+        => await DialogService.ShowAsync<DemoDialog, bool?>(new(), new DialogOptions {
+            Title = "I interrupted you",
+            Description = "this is to test the async functionality of the trace",
+            Dismissable = false
+        });
+
+    private async Task ShowModel() {
+        var a = await DialogService.ShowAsync<DemoDialog, bool?>(new(), new DialogOptions {
+            Title = "Alternate Title",
+            Description = "Alternate Description",
+            Dismissable = false
+        });
+        if (a == true)
+        {
+            await ToastService.Toast(
+                $"Custom Error : {a}",
+                ToastType.Error,
+                (options) => {
+                    options.Description = "Something went really wrong";
+                }
+            );
+        }
+    }
+
+    private List<TraceModel> Items => [
+        new(){
+            Title = "Save Your Changes",
+            Description = "Click to begin",
+            Action = TraceAction.Executable,
+            Status = TraceStatus.Pending,
+            AsyncAction = async (item) => {
+                item.Description = "Querying database ...";
+                await Task.Delay(3000);
+                item.Description = $"Prepping : {Random.Shared.Next(0, 20)}";
+            },
+            Children = [
+        new(){
+            Title = "Saving Changes",
+            Description = "We will modify your changes",
+            Action = TraceAction.Executable,
+            Status = TraceStatus.Pending,
+            AsyncAction = async (item) => {
+                item.Description = "Updating database ...";
+                await Task.Delay(3000);
+                var a = await Interrupt();
+                if(a == false) {
+                    item.Status = TraceStatus.Error;
+                    throw new Exception("DENIED");
+                }
+                item.Description = $"Changes Saved : {Random.Shared.Next(0, 20)}";
+            },
+            Children = [
+                       new(){
+            Title = "Fetching Data",
+            Action = TraceAction.Collapsible,
+            Status = TraceStatus.Pending,
+            DefaultOpen = true,
+            AsyncAction = async (item) => {
+                item.Description = "Reloading Profile ...";
+                await Task.Delay(3000);
+                await ToastService.Toast("Loaded", ToastType.Success);
+                item.Description = $"User Loaded : {Random.Shared.Next(0, 20)}";
+            },
+            Children = [
+                                new(){
+            Title = "Saving Changes",
+            Description = "We will modify your changes",
+            Action = TraceAction.Executable,
+            Status = TraceStatus.Pending,
+            AsyncAction = async (item) => {
+                item.Description = "Updating database ...";
+                await Task.Delay(3000);
+                await ToastService.Toast("Loaded", ToastType.Success);
+                item.Description = $"Changes Saved : {Random.Shared.Next(0, 20)}";
+            },
+            Children = [
+                       new(){
+            Title = "Fetching Data",
+            Action = TraceAction.Executable,
+            Status = TraceStatus.Pending,
+            AsyncAction = async (item) => {
+                item.Description = "Reloading Profile ...";
+                await Task.Delay(3000);
+                item.Description = $"User Loaded : {Random.Shared.Next(0, 20)}";
+            }
+    }
+            ]
+    }
+]
+    },
+
+]
+    },
+
+]
+    }
+    ];
+}
+
+<PageTitle>Home</PageTitle>
+<AsideRail>
+    <Button Size="ButtonSize.Icon">
+        x
+    </Button>
+        <Button Size="ButtonSize.Icon">
+        x
+    </Button>
+    <Button Size="ButtonSize.Icon">
+        x
+    </Button>
+</AsideRail>
+<Container>
+    <NavigationToggle>
+        <Button>Toggle</Button>
+    </NavigationToggle>
+    <Progress Max="100" Value="40"></Progress>
+    <Progress Max="100" Value="40" Indeterminate></Progress>
+    <Progress Max="200" Value="40">
+        <ProgressLabel>Label</ProgressLabel>
+        <ProgressValue />
+    </Progress>
+    <Progress Auto="5"></Progress>
+
+    <div style="display: flex; gap: var(--spacing); align-items: center;">
+        <Button OnClick="() => { StartRunning = !StartRunning; }">
+            Toggle
+        </Button>
+        @if (StartRunning)
+        {
+            <p>Task is running</p>
+        }
+        else
+        {
+            <p>Task is stopped</p>
+        }
+        <AutoMarker Interval="4" 
+            Habit="TestDelay" 
+            Message="Auto save" 
+            Start="@StartRunning"
+            Loading="Saving data ..."
+            Completed="Saved to somewhere"
+            />
+    </div>
+
+    <Toolbar>
+        <Tooltip Delay="500">
+            <TooltipTrigger>
+                <Button Size="ButtonSize.Icon">X</Button>
+            </TooltipTrigger>
+            <TooltipContent>
+                <span>Press this</span>
+            </TooltipContent>
+        </Tooltip>
+        <Tooltip Delay="500">
+            <TooltipTrigger>
+                <Button Size="ButtonSize.Icon">X</Button>
+            </TooltipTrigger>
+            <TooltipContent>
+                <span>or this</span>
+            </TooltipContent>
+        </Tooltip>
+        <Tooltip Delay="800">
+            <TooltipTrigger>
+                <Button Size="ButtonSize.Icon">X</Button>
+            </TooltipTrigger>
+            <TooltipContent>
+                <span>maybe this</span>
+            </TooltipContent>
+        </Tooltip>
+        <Tooltip Delay="1000">
+            <TooltipTrigger>
+                <Button Size="ButtonSize.Icon">X</Button>
+            </TooltipTrigger>
+            <TooltipContent>
+                <span>press something</span>
+            </TooltipContent>
+        </Tooltip>
+    </Toolbar>
+
+    <Alert>
+        <Icon>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </Icon>
+        <ChildContent>
+            <AlertTitle>Alert</AlertTitle>
+            <AlertDescription>blah blah blah</AlertDescription>
+        </ChildContent>
+    </Alert>
+
+    <Alert Variant="AlertVariant.Success" AutoDismiss="3000">
+        <Icon>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </Icon>
+        <ChildContent>
+            <AlertTitle>Success</AlertTitle>
+            <AlertDescription>blah blah blah</AlertDescription>
+        </ChildContent>
+    </Alert>
+
+    <Alert Variant="AlertVariant.Success" AutoDismiss="6000">
+        <Icon>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </Icon>
+        <ChildContent>
+            <AlertTitle>Success</AlertTitle>
+        </ChildContent>
+    </Alert>
+
+    <Alert Variant="AlertVariant.Information">
+        <Icon>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </Icon>
+        <ChildContent>
+            <AlertTitle>Information</AlertTitle>
+            <AlertDescription>blah blah blah</AlertDescription>
+        </ChildContent>
+    </Alert>
+
+    <Alert Variant="AlertVariant.Warning">
+        <Icon>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </Icon>
+        <ChildContent>
+            <AlertTitle>Warning</AlertTitle>
+            <AlertDescription>blah blah blah</AlertDescription>
+        </ChildContent>
+    </Alert>
+
+    <Alert Variant="AlertVariant.Danger">
+        <Icon>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </Icon>
+        <ChildContent>
+            <AlertTitle>Danger</AlertTitle>
+            <AlertDescription>blah blah blah</AlertDescription>
+        </ChildContent>
+    </Alert>
+
+    <Avatar Source="">
+        <Fallback>
+            <span>JC</span>
+        </Fallback>
+    </Avatar>
+    <div style="display: flex; gap: var(--spacing);">
+
+        <NotificationBadge Count="10">
+            <Avatar Size="AvatarSize.Small" Source="https://plus.unsplash.com/premium_photo-1789080178308-24a2baf5a9d6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D">
+                <Fallback>
+                    <span>BA</span>
+                </Fallback>
+            </Avatar>
+        </NotificationBadge>
+
+        <NotificationBadge Location="BadgeLocation.BottomRight" Count="10" Maximum="9">
+            <Avatar Size="AvatarSize.Small" Source="https://plus.unsplash.com/premium_photo-1789080178308-24a2baf5a9d6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D">
+                <Fallback>
+                    <span>BA</span>
+                </Fallback>
+            </Avatar>
+        </NotificationBadge>
+
+        <NotificationBadge Dot Location="BadgeLocation.TopLeft">
+            <Avatar Size="AvatarSize.Small" Source="https://plus.unsplash.com/premium_photo-1789080178308-24a2baf5a9d6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D">
+                <Fallback>
+                    <span>BA</span>
+                </Fallback>
+            </Avatar>
+        </NotificationBadge>
+
+        <NotificationBadge Location="BadgeLocation.BottomLeft" Count="99">
+            <Avatar Size="AvatarSize.Small" Source="https://plus.unsplash.com/premium_photo-1789080178308-24a2baf5a9d6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D">
+                <Fallback>
+                    <span>BA</span>
+                </Fallback>
+            </Avatar>
+        </NotificationBadge>
+    </div>
+
+    <Avatar Source="https://plus.unsplash.com/premium_photo-1789080178308-24a2baf5a9d6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D">
+        <Fallback>
+            <span>BA</span>
+        </Fallback>
+    </Avatar>
+
+    <Avatar Size="AvatarSize.Large" Source="https://plus.unsplash.com/premium_photo-1789080178308-24a2baf5a9d6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D">
+        <Fallback>
+            <span>BA</span>
+        </Fallback>
+    </Avatar>
+
+    <Avatar Size="AvatarSize.ExtraLarge" Source="https://plus.unsplash.com/premium_photo-1789080178308-24a2baf5a9d6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D">
+        <Fallback>
+            <span>BA</span>
+        </Fallback>
+    </Avatar>
+
+    <Thinking Text="one banana, two bananam three bananam four ..." />
+    <Thinking Text="Bacon ipsum dolor amet chuck turducken meatball, sirloin frankfurter mortadella porchetta chislic chicken prosciutto pancetta strip steak ham. Venison cow burgdoggen, pork ham hock bresaola drumstick kevin leberkas beef bacon. Shank chislic pig pork belly brisket. Burgdoggen turducken beef ribs shoulder shank alcatra turkey ham hamburger bresaola jowl beef strip steak. Flank meatball chuck spare ribs, fatback filet mignon kevin drumstick corned beef salami shank polony. Bacon picanha salami swine, beef ribs shankle kielbasa boudin leberkas tri-tip." />
+
+    <ScrollArea>
+        <Card>
+            <CardHeader>
+                <CardTitle class="heading1">Basic Text</CardTitle>
+                <CardDescription>Basic Text Elements</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div class="display">Display</div>
+                <div class="heading1">Heading-1</div>
+                <div class="heading2">Heading-2</div>
+                <div class="heading3">Heading-3</div>
+                <div class="body">Body</div>
+                <div class="label">Label</div>
+                <div class="caption">Caption</div>
+                <pre style="padding: var(--spacing); background: var(--muted);">
+<code>
+    <pre>
+        @("""
+<div class="display">Display</div>
+<div class="heading1">Heading-1</div>
+<div class="heading2">Heading-2</div>
+<div class="heading3">Heading-3</div>
+<div class="body">Body</div>
+<div class="label">Label</div>
+<div class="caption">Caption</div>
+""")
+    </pre>
+</code>
+            </pre>
+                <br />
+            </CardContent>
+        </Card>
+        @*         <Trace Items="Items" /> *@
+    </ScrollArea>
+
+    <Breadcrumbs>
+        <Breadcrumb Label="Colors" Href="/colors" />
+        <BreadcrumbSeparator />
+        <Breadcrumb Label="Home" Href="/" Active />
+        <BreadcrumbSeparator />
+        <Breadcrumb Label="Charts" Href="/charts" />
+    </Breadcrumbs>
+
+    <div style="display: flex; gap: var(--spacing);">
+        <ButtonGroup>
+            <NotificationBadge Dot>
+                <Button OnClick="OpenSheetRight">
+                    Sheet - Right
+                </Button>
+            </NotificationBadge>
+            <NotificationBadge Count="10">
+
+                <Button OnClick="OpenSheetLeft">
+                    Sheet - Left
+                </Button>
+            </NotificationBadge>
+        </ButtonGroup>
+        <ButtonGroup>
+            <Button OnClick="OpenSheetTop">
+                Sheet - Top
+            </Button>
+            <Button OnClick="OpenSheetBottom">
+                Sheet - Bottom
+            </Button>
+            <Button Size="ButtonSize.Icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+            </Button>
+        </ButtonGroup>
+        <Button Size="ButtonSize.Icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </Button>
+    </div>
+    <div style="display: flex; gap: var(--spacing);">
+        <ButtonGroup>
+            <Button OnClick="Confirmation">
+                Dialog
+            </Button>
+            <Button OnClick="ShowModel">
+                Dialog Modal
+            </Button>
+            <Button OnClick="ShowEmpty">
+                Empty
+            </Button>
+        </ButtonGroup>
+    </div>
+
+    <Tooltip Delay="500">
+        <TooltipTrigger>
+            <Button>Tooltip</Button>
+        </TooltipTrigger>
+        <TooltipContent>
+            <p>Information</p>
+        </TooltipContent>
+    </Tooltip>
+    <Item Link="/Forms">
+        <ItemContent>
+            <ItemTitle>Form Components</ItemTitle>
+            <ItemDescription>
+                Fields, Sets, Input Types
+            </ItemDescription>
+        </ItemContent>
+        <ItemActions>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </ItemActions>
+    </Item>
+
+    <Item Link="/Data">
+        <ItemContent>
+            <ItemTitle>Data Components</ItemTitle>
+            <ItemDescription>
+                Tables, Charts
+            </ItemDescription>
+        </ItemContent>
+        <ItemActions>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" /></svg>
+        </ItemActions>
+    </Item>
+
+    <Shimmer>
+        Shimmering Text
+    </Shimmer>
+
+    <ChipSet @bind-Value="ToggleValue">
+        <Chip Value="@("one")">Toggle</Chip>
+        <Chip Value="@("two")">Toggle</Chip>
+        <Chip Value="@("three")">Toggle</Chip>
+        <p>
+            @ToggleValue
+        </p>
+    </ChipSet>
+
+    <Marquee>
+        <Item>
+            <ItemContent>
+                <ItemTitle>One</ItemTitle>
+            </ItemContent>
+        </Item>
+        <Button>one</Button>
+        <Button>two</Button>
+        <Button>three</Button>
+        <Button>four</Button>
+    </Marquee>
+
+    <Popover>
+        <PopoverTrigger>
+            <Tooltip>
+                <TooltipTrigger>
+                    <Button>Popover</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <span>Click this</span>
+                </TooltipContent>
+            </Tooltip>
+        </PopoverTrigger>
+        <PopoverContent>
+            <Item>
+                <ItemContent>
+                    <ItemTitle>This is a popover</ItemTitle>
+                </ItemContent>
+            </Item>
+        </PopoverContent>
+    </Popover>
+
+    <Popover>
+        <PopoverTrigger>
+            <Button>Popover</Button>
+        </PopoverTrigger>
+        <PopoverContent>
+            <Card>
+                <CardHeader>
+                    <CardTitle class="heading1">Basic Text</CardTitle>
+                    <CardDescription>Basic Text Elements</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div class="display">Display</div>
+                    <div class="heading1">Heading-1</div>
+                    <div class="heading2">Heading-2</div>
+                    <div class="heading3">Heading-3</div>
+                    <div class="body">Body</div>
+                    <div class="label">Label</div>
+                    <div class="caption">Caption</div>
+                </CardContent>
+            </Card>
+        </PopoverContent>
+    </Popover>
+
+    <Card>
+        <CardHeader>
+            <CardTitle class="heading1">Basic Text</CardTitle>
+            <CardDescription>Basic Text Elements</CardDescription>
+        </CardHeader>
+        <CardContent>
+
+            <div class="display">Display</div>
+            <div class="heading1">Heading-1</div>
+            <div class="heading2">Heading-2</div>
+            <div class="heading3">Heading-3</div>
+            <div class="body">Body</div>
+            <div class="label">Label</div>
+            <div class="caption">Caption</div>
+            <pre style="padding: var(--spacing); background: var(--muted);">
+<code>
+    <pre>
+        @("""
+<div class="display">Display</div>
+<div class="heading1">Heading-1</div>
+<div class="heading2">Heading-2</div>
+<div class="heading3">Heading-3</div>
+<div class="body">Body</div>
+<div class="label">Label</div>
+<div class="caption">Caption</div>
+""")
+    </pre>
+</code>
+            </pre>
+            <br />
+        </CardContent>
+    </Card>
+
+    <Card>
+        <CardHeader>
+            <CardTitle class="heading1">
+                Pre-Styled Text
+            </CardTitle>
+            <CardDescription>
+                Basic HTML Elements
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <ScrollArea>
+
+                <h1>H1 Heading</h1>
+                <h2>H2 Heading</h2>
+                <h3>H3 Heading</h3>
+                <h4>H4 Heading</h4>
+                <h5>H5 Heading</h5>
+                <h6>H6 Heading</h6>
+                <p>
+                    Ham biltong leberkas ribeye pancetta short loin, chislic turkey beef ribs sirloin cow.
+                    Polony brisket leberkas bacon. Venison kevin chicken fatback,
+                    salami capicola beef ribs ground round cow burgdoggen prosciutto kielbasa
+                    pork loin ribeye polony. Buffalo shoulder leberkas bresaola.
+                    Prosciutto ham turkey andouille chislic.
+                </p>
+                <p>
+                    Alcatra buffalo salami meatloaf ground round frankfurter swine kielbasa
+                    short ribs ball tip burgdoggen turkey beef ribs.
+                    Beef biltong brisket alcatra swine, pig meatball bacon strip
+                    steak prosciutto landjaeger. Shank turducken andouille buffalo,
+                    pork belly sirloin ham hock polony frankfurter picanha ground round short ribs.
+                    Meatball jowl buffalo turkey corned beef picanha venison.
+                    Chicken tenderloin corned beef ham, prosciutto ribeye pancetta
+                    kielbasa porchetta boudin ball tip salami kevin.
+                </p>
+                <span>Span</span>
+                <small>Small</small>
+                <pre style="padding: var(--spacing); background: var(--muted);">
+            <code>
+                <pre>
+                    @("""
+<h1>H1 Heading</h1>
+<h2>H2 Heading</h2>
+<h3>H3 Heading</h3>
+<h4>H4 Heading</h4>
+<h5>H5 Heading</h5>
+<h6>H6 Heading</h6>
+<p>
+    Ham biltong leberkas ribeye pancetta short loin, chislic turkey beef ribs sirloin cow.
+    Polony brisket leberkas bacon. Venison kevin chicken fatback,
+    salami capicola beef ribs ground round cow burgdoggen prosciutto kielbasa
+    pork loin ribeye polony. Buffalo shoulder leberkas bresaola.
+    Prosciutto ham turkey andouille chislic.
+</p>
+<p>
+    Alcatra buffalo salami meatloaf ground round frankfurter swine kielbasa
+    short ribs ball tip burgdoggen turkey beef ribs.
+    Beef biltong brisket alcatra swine, pig meatball bacon strip
+    steak prosciutto landjaeger. Shank turducken andouille buffalo,
+    pork belly sirloin ham hock polony frankfurter picanha ground round short ribs.
+    Meatball jowl buffalo turkey corned beef picanha venison.
+    Chicken tenderloin corned beef ham, prosciutto ribeye pancetta
+    kielbasa porchetta boudin ball tip salami kevin.
+</p>
+<span>Span</span>
+<small>Small</small>
+""")
+                </pre>
+            </code>
+            </pre>
+            </ScrollArea>
+        </CardContent>
+    </Card>
+
+
+    <Card>
+        <CardHeader>
+            <CardTitle class="heading1">
+                Prose, automatic text formatting
+            </CardTitle>
+            <CardDescription>
+                Using basic text elements will format themselves based on 1em ( current text size )
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+
+
+            <article class="prose">
+                <h1>Heading</h1>
+                <p>
+                    Ribeye jerky prosciutto pancetta tenderloin sausage ground round. Ham hock buffalo short loin, cow rump picanha t-bone turducken sirloin. Rump meatball drumstick jowl venison brisket ham strip steak. Bacon hamburger capicola doner salami drumstick pork belly pork picanha. Prosciutto pork short loin meatloaf beef ribs corned beef biltong burgdoggen beef turkey tail brisket pastrami tenderloin short ribs. Short ribs capicola prosciutto, jowl andouille sausage kielbasa landjaeger boudin pig chislic shankle.
+                </p>
+                <h2>Heading</h2>
+                <p>
+                    Ribeye jerky prosciutto pancetta tenderloin sausage ground round. Ham hock buffalo short loin, cow rump picanha t-bone turducken sirloin. Rump meatball drumstick jowl venison brisket ham strip steak. Bacon hamburger capicola doner salami drumstick pork belly pork picanha. Prosciutto pork short loin meatloaf beef ribs corned beef biltong burgdoggen beef turkey tail brisket pastrami tenderloin short ribs. Short ribs capicola prosciutto, jowl andouille sausage kielbasa landjaeger boudin pig chislic shankle.
+                </p>
+                <h3>Heading</h3>
+                <p>
+                    Ribeye jerky prosciutto pancetta tenderloin sausage ground round. Ham hock buffalo short loin, cow rump picanha t-bone turducken sirloin. Rump meatball drumstick jowl venison brisket ham strip steak. Bacon hamburger capicola doner salami drumstick pork belly pork picanha. Prosciutto pork short loin meatloaf beef ribs corned beef biltong burgdoggen beef turkey tail brisket pastrami tenderloin short ribs. Short ribs capicola prosciutto, jowl andouille sausage kielbasa landjaeger boudin pig chislic shankle.
+                </p>
+                <h4>Heading</h4>
+                <p>
+                    Ribeye jerky prosciutto pancetta tenderloin sausage ground round. Ham hock buffalo short loin, cow rump picanha t-bone turducken sirloin. Rump meatball drumstick jowl venison brisket ham strip steak. Bacon hamburger capicola doner salami drumstick pork belly pork picanha. Prosciutto pork short loin meatloaf beef ribs corned beef biltong burgdoggen beef turkey tail brisket pastrami tenderloin short ribs. Short ribs capicola prosciutto, jowl andouille sausage kielbasa landjaeger boudin pig chislic shankle.
+                </p>
+                <h5>Heading</h5>
+                <p>
+                    Ribeye jerky prosciutto pancetta tenderloin sausage ground round. Ham hock buffalo short loin, cow rump picanha t-bone turducken sirloin. Rump meatball drumstick jowl venison brisket ham strip steak. Bacon hamburger capicola doner salami drumstick pork belly pork picanha. Prosciutto pork short loin meatloaf beef ribs corned beef biltong burgdoggen beef turkey tail brisket pastrami tenderloin short ribs. Short ribs capicola prosciutto, jowl andouille sausage kielbasa landjaeger boudin pig chislic shankle.
+                </p>
+                <ul>
+                    <li>line 1</li>
+                    <li>line 1</li>
+                    <li>line 1</li>
+                </ul>
+
+                <ol>
+                    <li>line 2</li>
+                    <li>line 2</li>
+                    <li>line 2</li>
+                </ol>
+
+
+                <h6>Heading</h6>
+                <p>
+                    Ribeye jerky prosciutto pancetta tenderloin sausage ground round. Ham hock buffalo short loin, cow rump picanha t-bone turducken sirloin. Rump meatball drumstick jowl venison brisket ham strip steak. Bacon hamburger capicola doner salami drumstick pork belly pork picanha. Prosciutto pork short loin meatloaf beef ribs corned beef biltong burgdoggen beef turkey tail brisket pastrami tenderloin short ribs. Short ribs capicola prosciutto, jowl andouille sausage kielbasa landjaeger boudin pig chislic shankle.
+                </p>
+
+            </article>
+        </CardContent>
+    </Card>
+</Container>
+
+

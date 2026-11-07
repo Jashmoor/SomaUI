@@ -1,0 +1,28 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Sections
+@inherits BaseWithChildComponent
+@implements IDisposable
+
+<nav navigation-rail>
+    <SectionOutlet SectionName="__breadcrumbs" />
+    @ChildContent
+</nav>
+
+@code {
+    [CascadingParameter(Name = "__application-context")]
+    internal ApplicationContext ApplicationContext { get; set; } = default!;
+
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    private void HandleStateChange()
+        => InvokeAsync(StateHasChanged);
+
+    protected override void OnInitialized() {
+        ApplicationContext.OnStateChange += HandleStateChange;
+    }
+
+    public override void Dispose() {
+        ApplicationContext.OnStateChange -= HandleStateChange;
+        base.Dispose();
+    }
+}

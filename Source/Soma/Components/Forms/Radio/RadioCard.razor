@@ -1,0 +1,21 @@
+﻿@namespace SomaUI
+@typeparam T
+@inherits RadioItem<T>
+
+<Item @onclick="OnClick" radio checked="@IsChecked">
+    <ItemMedia>
+        <span radio-dummy checked="@IsChecked"></span>
+    </ItemMedia>
+    <ItemContent>
+        <ItemTitle>
+            @Label
+        </ItemTitle>
+        <ItemDescription>
+            @Description
+        </ItemDescription>
+    </ItemContent>
+</Item>
+
+@code {
+    [Parameter, EditorRequired] public string Description { get; set; }
+}

@@ -1,0 +1,10 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<td td loading="@Loading" @attributes="Attributes">
+    @ChildContent
+</td>
+
+@code {
+    [Parameter] public bool Loading { get; set; } = false;
+}

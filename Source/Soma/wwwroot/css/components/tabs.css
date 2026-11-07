@@ -1,0 +1,83 @@
+﻿[tabs] {
+    --tabs-padding: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--spacing-xxs);
+    padding: var(--tabs-padding);
+    anchor-scope: attr(data-scope type(<custom-ident>));
+    max-inline-size: 100%;
+    overflow-x: auto;
+    max-block-size: fit-content;
+}
+
+[tabs-list] {
+    display: flex;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xxs);
+    border-radius: var(--spacing-sm);
+    background: transparent;
+    border-width: 1px;
+    border-color: transparent;
+    inline-size: fit-content;
+
+    &[bordered] {
+        border-color: var(--border);
+    }
+
+    &::after {
+        position: absolute;
+        content: "";
+        border-radius: inherit;
+        transition: inset-inline var(--animation-speed-fast) var(--ease-in-out);
+        position-anchor: attr(data-anchor type(<custom-ident>));
+        background: var(--popover);
+        inset: anchor(start) anchor(end) anchor(end) anchor(start);
+    }
+}
+
+[tabs][primary-tab] {
+
+    & [tab-trigger]:not([active]) {
+        color: var(--text-secondary-color);
+    }
+
+
+    & [tabs-list] {
+        inline-size: 100%;
+        background: transparent;
+        border-color: var(--border);
+        border-width: 0;
+        border-radius: 0;
+        border-bottom-width: 2px;
+
+        &::after {
+            position: absolute;
+            content: "";
+            block-size: 2px;
+            border-radius: inherit;
+            transition: inset-inline var(--animation-speed-fast) var(--ease-in-out);
+            position-anchor: attr(data-anchor type(<custom-ident>));
+            background: var(--text-color);
+            inset: calc(anchor(bottom) + 4px) anchor(end) anchor(end) anchor(start);
+        }
+    }
+}
+
+[tab-trigger] {
+    border-radius: inherit;
+    padding-block: var(--spacing-sm);
+    padding-inline: var(--spacing);
+    background: transparent;
+    z-index: 2;
+    color: var(--text-color);
+
+    &[active] {
+        anchor-name: attr(data-anchor type(<custom-ident>));
+        background: transparent;
+    }
+}
+
+[tabs-content] {
+    padding: var(--tabs-padding);
+}

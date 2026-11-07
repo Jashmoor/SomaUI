@@ -1,0 +1,113 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Forms
+@inherits FormComponent<bool>
+@implements IAsyncDisposable
+
+<div style="display: flex; inline-size: fit-content; gap: var(--spacing-xs); align-items: center;">
+    <button checkbox
+            id="@UniqueID"
+            type="button"
+            role="checkbox"
+            check-state="@CheckState"
+            disabled="@Disabled"
+            tabindex="@(Disabled ? -1 : 0)"
+            @onclick="HandleClick"
+            @attributes="Attributes">
+
+        @if (Value)
+        {
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="text-current">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        }
+        else if (Indeterminate)
+        {
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="text-current">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        }
+    </button>
+    @ChildContent
+    <input type="hidden" name="@Name" checked="@Value" @bind:get="Value" @bind:set="UpdateValue" @attributes="Attributes" id="@(FieldContext?.Id ?? UniqueID)" />
+</div>
+
+
+@code {
+
+    [Parameter] public bool Indeterminate { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+    [Parameter] public bool? Checked { get; set; } = null!;
+
+    private string CheckState {
+        get {
+            if (Indeterminate) return "indeterminate";
+            return Value ? "checked" : "unchecked";
+        }
+    }
+
+    private async Task HandleClick() {
+        if (Indeterminate)
+        {
+            Indeterminate = false;
+        }
+        await UpdateValue(!Value);
+    }
+
+    internal InputValidation? Validation;
+
+    private async Task UpdateValue(bool value) {
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+        if (Validation is not null)
+            await Validation.NotifyFieldChanged();
+    }
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+
+        Validation = new(this, () => EditContext, () => true, () => (FieldContext?.Id ?? UniqueID));
+    }
+
+    protected override void OnParametersSet() {
+        base.OnParametersSet();
+
+        if (Checked.HasValue)
+            Value = Checked.Value;
+
+        if (Validation is not null)
+            Validation.OnParametersSet((For ?? ValueExpression));
+    }
+
+    internal override void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) {
+        if (Validation is not null)
+        {
+            InvokeAsync(async () => {
+                var render = await Validation.HandleValidationStateChange();
+                if (render)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+    }
+
+    public override async ValueTask DisposeAsync() {
+        if (Validation is not null)
+            await Validation.DisposeAsync();
+        await base.DisposeAsync();
+    }
+}

@@ -1,0 +1,299 @@
+﻿@page "/Forms"
+@using System.ComponentModel.DataAnnotations
+@using TestBench.Attributes
+@rendermode InteractiveServer
+
+<Container>
+    <Fab Fixed>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" /></svg>
+    </Fab>
+    <Select @bind-Value="@Values" Placeholder="-">
+        <Option Value="1" />
+        <Option Value="2" />
+        <Option Value="3" />
+        <OptionGroup Label="group">
+            <Option Value="4" />
+            <Option Value="5" />
+            <Option Value="6" />
+        </OptionGroup>
+    </Select>
+
+    <Collapsible Title="Expand for more information">
+        <Button OnClick="() => { Loading = !Loading; }">
+            Child
+        </Button>
+        <Button Href="/Home">
+            Link
+        </Button>
+        <Button>
+            Long text
+        </Button>
+        <Button Loading="@Loading">
+            Child
+        </Button>
+        <Button Disabled="@Loading">
+            Child
+        </Button>
+        <Button Loading="@Loading">
+            <LoadingTemplate>
+                <Shimmer>Test</Shimmer>
+            </LoadingTemplate>
+            <ChildContent>
+                Child
+            </ChildContent>
+        </Button>
+
+        <Button Loading="@Loading" IconPosition="IconPosition.End">
+            <Icon>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m480-560-56-56 63-64H320v-80h167l-64-64 57-56 160 160-160 160ZM223.5-103.5Q200-127 200-160t23.5-56.5Q247-240 280-240t56.5 23.5Q360-193 360-160t-23.5 56.5Q313-80 280-80t-56.5-23.5Zm400 0Q600-127 600-160t23.5-56.5Q647-240 680-240t56.5 23.5Q760-193 760-160t-23.5 56.5Q713-80 680-80t-56.5-23.5ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z" /></svg>
+            </Icon>
+            <ChildContent>
+                Child
+            </ChildContent>
+        </Button>
+    </Collapsible>
+
+    <div style="display: inline-flex; gap: 1rem;">
+        <ButtonGroup>
+            <Button OnClick="() => { Loading = !Loading; }">
+                Child
+            </Button>
+            <Button OnClick="PretendToLoad">
+                Link
+            </Button>
+        </ButtonGroup>
+
+        <ButtonGroup>
+            <Button OnClick="() => { Loading = !Loading; }">
+                Child
+            </Button>
+            <Button>
+                Link
+            </Button>
+            <Button>
+                Link
+            </Button>
+        </ButtonGroup>
+    </div>
+
+
+    <Button OnClick="() => { Loading = !Loading; }">
+        Child
+    </Button>
+    <ButtonGroup>
+        <Button Variant="ButtonVariant.Ghost">Ghost</Button>
+        <Button Variant="ButtonVariant.Secondary">Secondary</Button>
+        <Button Variant="ButtonVariant.Destructive">Destructive</Button>
+        <Button Variant="ButtonVariant.Primary">Primary</Button>
+    </ButtonGroup>
+    <Button Href="/Home">
+        Link
+    </Button>
+    <Button>
+        Long text
+    </Button>
+    <Button Loading="@Loading">
+        Child
+    </Button>
+    <Button Disabled="@Loading">
+        Child
+    </Button>
+    <Button Loading="@Loading">
+        <LoadingTemplate>
+            <Shimmer>Test</Shimmer>
+        </LoadingTemplate>
+        <ChildContent>
+            Child
+        </ChildContent>
+    </Button>
+
+    <Button Loading="@Loading" IconPosition="IconPosition.End">
+        <Icon>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="m480-560-56-56 63-64H320v-80h167l-64-64 57-56 160 160-160 160ZM223.5-103.5Q200-127 200-160t23.5-56.5Q247-240 280-240t56.5 23.5Q360-193 360-160t-23.5 56.5Q313-80 280-80t-56.5-23.5Zm400 0Q600-127 600-160t23.5-56.5Q647-240 680-240t56.5 23.5Q760-193 760-160t-23.5 56.5Q713-80 680-80t-56.5-23.5ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z" /></svg>
+        </Icon>
+        <ChildContent>
+            Child
+        </ChildContent>
+    </Button>
+
+    <h1>Forms</h1>
+
+    <EditForm EditContext="@Context">
+        <DataAnnotationsValidator />
+
+
+        <FieldSet>
+            <Item style="padding: 0;">
+                <ItemMedia>
+                    <Avatar Source="" Size="AvatarSize.Small">
+                        <Fallback>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="m480-560-56-56 63-64H320v-80h167l-64-64 57-56 160 160-160 160ZM223.5-103.5Q200-127 200-160t23.5-56.5Q247-240 280-240t56.5 23.5Q360-193 360-160t-23.5 56.5Q313-80 280-80t-56.5-23.5Zm400 0Q600-127 600-160t23.5-56.5Q647-240 680-240t56.5 23.5Q760-193 760-160t-23.5 56.5Q713-80 680-80t-56.5-23.5ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z" /></svg>
+                        </Fallback>
+                    </Avatar>
+                </ItemMedia>
+                <ItemContent>
+                    <ItemTitle>
+                        Edit your Details
+                    </ItemTitle>
+                    <ItemDescription>
+                        Item Description
+                    </ItemDescription>
+                </ItemContent>
+            </Item>
+
+            <Item style="padding: 0;">
+                <ItemMedia>
+                    <Avatar Size="AvatarSize.ExtraLarge" Source="https://plus.unsplash.com/premium_photo-1791039503170-f815dec16ddc?q=80&w=1466&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D">
+                        <Fallback></Fallback>
+                    </Avatar>
+                </ItemMedia>
+                <ItemContent>
+                    <ItemTitle>
+                        Edit your Details
+                    </ItemTitle>
+                    <ItemDescription>
+                        Item Description
+                    </ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                    <span class="caption muted">2m ago</span>
+                </ItemActions>
+            </Item>
+            <Field T="string" For="() => Model.Value">
+                <FieldLabel>Test Label</FieldLabel>
+                <TextBox @bind-Value="@Model.Value" />
+                <FieldDescription T="string">
+                    Replace This
+                </FieldDescription>
+            </Field>
+            <Field T="int?" For="() => Values">
+                <FieldLabel>Select Option</FieldLabel>
+                <Select @bind-Value="@Values" Placeholder="please select">
+                    <Option Value="1" />
+                    <Option Value="2" />
+                    <Option Value="3" />
+                    <OptionGroup Label="group">
+                        <Option Value="4" />
+                        <Option Value="5" />
+                        <Option Value="6" />
+                    </OptionGroup>
+                </Select>
+                <FieldDescription T="int">
+                    Options
+                </FieldDescription>
+            </Field>
+            <Field T="string" For="() => Model.Description">
+                <FieldLabel>Field Label</FieldLabel>
+                <TextArea @bind-Value="@Model.Description" />
+                <FieldDescription T="string">
+                    Description
+                </FieldDescription>
+            </Field>
+            <FieldGroup>
+                <div style="display: flex; gap: inherit;">
+
+                    <Field T="string" For="() => Model.Value">
+                        <FieldLabel>Test Label</FieldLabel>
+                        <TextBox @bind-Value="@Model.Value" />
+                        <FieldDescription T="string">
+                            Replace This
+                        </FieldDescription>
+                    </Field>
+                    <Field T="int?" For="() => Values">
+                        <FieldLabel>Select Option</FieldLabel>
+                        <Select @bind-Value="@Values" Placeholder="-">
+                            <Option Value="1" />
+                            <Option Value="2" />
+                            <Option Value="3" />
+                            <OptionGroup Label="group">
+                                <Option Value="4" />
+                                <Option Value="5" />
+                                <Option Value="6" />
+                            </OptionGroup>
+                        </Select>
+                        <FieldDescription T="int">
+                            Options
+                        </FieldDescription>
+                    </Field>
+
+                </div>
+
+                <Field T="string" For="() => Model.Radio">
+                    <RadioGroup T="string" @bind-Value="Model.Radio" Description="tickle my pickle">
+                        <RadioOption Value="@("one")" Label="first" />
+                        <RadioOption Value="@("two")" Label="second" />
+                        <RadioOption Value="@("third")" Label="third" />
+                    </RadioGroup>
+                </Field>
+
+                <Field T="string" For="() => Model.Radio">
+                    <RadioGroup T="string" @bind-Value="Model.Radio" Description="pickle my tickle">
+                        <RadioCard Label="first" Description="Option One" Value="@("one")" />
+                        <RadioCard Label="second" Description="Option One" Value="@("two")" />
+                        <RadioCard Label="third" Description="Option One" Value="@("three")" />
+                    </RadioGroup>
+                </Field>
+
+
+                @*                 <Field T="bool" For="() => Model.Checked">
+                    <FieldLabel>Checkbox</FieldLabel>
+                    <CheckBox @bind-Value="@Model.Checked" />
+                    <FieldDescription T="bool">
+                        Agree to sell your soul
+                    </FieldDescription>
+                </Field> *@
+
+                <Field T="bool" For="() => Model.Checked">
+                    <CheckBox @bind-Value="@Model.Checked">
+                        <FieldLabel>Checkbox</FieldLabel>
+                    </CheckBox>
+                    <FieldDescription T="bool">
+                        Agree to sell your soul
+                    </FieldDescription>
+                </Field>
+            </FieldGroup>
+            <Fab>
+                x
+            </Fab>
+        </FieldSet>
+        <button type="submit">Submit</button>
+    </EditForm>
+
+    <div style="block-size: 50rem;"></div>
+</Container>
+
+
+
+@code {
+    private TestInput Model = new();
+    private EditContext? Context;
+
+    private int? Values;
+    private string? SearchValue;
+
+    private class TestInput {
+        [Required(ErrorMessage = "Your Name is Required"), MinLength(6, ErrorMessage = "Your Name is too short")]
+        public string? Value { get; set; }
+
+        [Required(ErrorMessage = "You must select something")]
+        public string? Radio { get; set; }
+
+        [Required(ErrorMessage = "Required"), MinLength(20, ErrorMessage = "Too Short")]
+        public string? Description { get; set; }
+
+        [Required(ErrorMessage = "You must choose")]
+        [CheckboxRequired(ErrorMessage = "You must agree")]
+        public bool Checked { get; set; }
+    }
+
+    private async Task PretendToLoad()
+        => await Task.Delay(3000);
+
+    protected override void OnInitialized() {
+        Model = new();
+        Context = new(Model);
+    }
+
+    public bool Loading = false;
+
+}

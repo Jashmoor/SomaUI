@@ -1,0 +1,29 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<CascadingValue Value="Context" IsFixed="false">
+    <nav role="navigation" @attributes="Attributes">
+        @ChildContent
+    </nav>
+</CascadingValue>
+
+@code {
+    private PaginationContext Context = new();
+
+    [Parameter] public PaginationState? State { get; set; }
+    [Parameter] public EventCallback<int> OnPageChange { get; set; }
+    [Parameter] public EventCallback<int> OnPageSizeChange { get; set; }
+
+    protected override void OnParametersSet() {
+        Context.State = State;
+        Context.PageSizes = [10, 20, 50, 100];
+        Context.OnPageChanged = async (page) => {
+            if (OnPageChange.HasDelegate)
+                await OnPageChange.InvokeAsync(page);
+        };
+        Context.OnPageSizeChanged = async (pageSize) => {
+            if (OnPageSizeChange.HasDelegate)
+                await OnPageSizeChange.InvokeAsync(pageSize);
+        };
+    }
+}

@@ -1,0 +1,9 @@
+﻿@namespace SomaUI
+
+<div progress-value>
+    @Value
+</div>
+
+@code {
+    [CascadingParameter(Name = "ProgressValue")] public int Value { get; set; } = 0;
+}

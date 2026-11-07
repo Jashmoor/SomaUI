@@ -1,0 +1,62 @@
+﻿@namespace SomaUI
+@using System.Globalization
+
+<Item toast
+      mounted="@Toast.Mounted"
+      rendered
+      success="@(Toast.Type == ToastType.Success)"
+      error="@(Toast.Type == ToastType.Error)"
+      preventable="@(Toast.Type == ToastType.Preventable)"
+      style="@GetToastStyle()"
+      lifted="@(Index != 0)"
+      expanded="@Expanded">
+    <ItemContent>
+        <ItemTitle>
+            @if (Toast.Type == ToastType.Loading)
+            {
+                <Shimmer>
+                    @Toast.Title
+                </Shimmer>
+            }
+            else
+            {
+                @Toast.Title
+            }
+        </ItemTitle>
+        <ItemDescription>@Toast.Description</ItemDescription>
+        @if (Toast.Type == ToastType.Loading)
+        {
+            <Progress Indeterminate style="padding-block-start: var(--spacing);" />
+        }
+        @if (Toast.Type == ToastType.Preventable)
+        {
+            <Progress Auto="@((Toast.Duration -50) / 1000)" style="padding-block-start: var(--spacing);" />
+        }
+    </ItemContent>
+    <ItemActions>
+        @if (Toast.Dismissable && Toast.Type != ToastType.Loading)
+        {
+            <Button OnClick="TryClose">
+                Close
+            </Button>
+        }
+    </ItemActions>
+</Item>
+
+@code {
+    [Parameter] public ToastDefinition Toast { get; set; } = default!;
+    [Parameter] public bool Expanded { get; set; }
+    [Parameter] public int Index { get; set; }
+    [Parameter] public double Offset { get; set; }
+    [Parameter] public int Total { get; set; } = 0;
+    [Parameter] public EventCallback<string> Close { get; set; }
+
+
+    private string GetToastStyle()
+        => string.Create(CultureInfo.InvariantCulture, $"--index: {Index}; --toasts-before: {Index}; --z-index: {Total - Index}; --offset: {Offset}px; --initial-height: {73.3}px;");
+
+    private async Task TryClose() {
+        if (Close.HasDelegate)
+            await Close.InvokeAsync(Toast.Id);
+    }
+}

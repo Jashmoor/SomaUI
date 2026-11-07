@@ -1,0 +1,27 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Sections
+@inherits BaseWithChildComponent
+
+
+<ul dropdown-content id="@Context.ContentId" @ref="Element" open="@Context.IsOpen">
+    @ChildContent
+</ul>
+
+@code {
+    [CascadingParameter] internal DropdownContext Context { get; set; } = default!;
+
+    protected override void OnInitialized() {
+        if (Context == null)
+            throw new InvalidOperationException("[DropdownContent] must be used within a [Dropdown] Component");
+        Context?.OnStateChange += HandleContextStateChange;
+    }
+
+    private void HandleContextStateChange()
+        => InvokeAsync(StateHasChanged);
+
+
+    public override void Dispose() {
+        Context?.OnStateChange -= HandleContextStateChange;
+        base.Dispose();
+    }
+}

@@ -1,0 +1,11 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<label field-label id="@(FieldContext?.LabelId)" for="@(FieldContext?.Id)">
+    @ChildContent
+</label>
+
+@code {
+    [CascadingParameter] internal FieldContext? FieldContext { get; set; }
+}
+

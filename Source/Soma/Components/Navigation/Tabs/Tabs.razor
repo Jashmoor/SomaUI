@@ -1,0 +1,31 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div @attributes="Attributes" data-scope="@AnchorScope" tabs primary-tab="@Primary">
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter] public string? Default { get; set; }
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public bool UrlControlled { get; set; }
+    [Parameter] public bool Primary { get; set; } = false;
+
+    private string? _selected;
+    public string? Selected => Value ?? _selected ?? Default;
+    internal string? AnchorScope = $"--anchor-{Guid.NewGuid().ToString("N")[..6]}";
+
+    protected override void OnInitialized() {
+        _selected = Default;
+    }
+
+    public async Task SelectTab(string value) {
+        _selected = value;
+        await ValueChanged.InvokeAsync(value);
+        StateHasChanged();
+    }
+
+}

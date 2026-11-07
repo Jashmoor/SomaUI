@@ -1,0 +1,19 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+@if (Float)
+{
+    <legend fieldset-legend @attributes="Attributes">
+        @ChildContent
+    </legend>
+}
+else
+{
+    <div fieldset-legend @attributes="Attributes">
+        @ChildContent
+    </div>
+}
+
+@code {
+    [Parameter] public bool Float { get; set; } = false;
+}

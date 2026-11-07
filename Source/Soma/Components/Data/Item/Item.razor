@@ -1,0 +1,15 @@
+﻿@inherits BaseComponent
+@namespace SomaUI
+
+@if (Link is { Length: > 1 })
+{
+    <a href="@Link" item @attributes="Attributes" data-variant="@Variant" data-density="@Density" disabled="@Disabled" skeleton="@Loading">
+        @ChildContent
+    </a>
+}
+else
+{
+    <div item @attributes="Attributes" data-variant="@Variant" data-density="@Density" disabled="@Disabled" skeleton="@Loading">
+        @ChildContent
+    </div>
+}

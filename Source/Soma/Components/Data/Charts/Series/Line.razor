@@ -1,0 +1,238 @@
+﻿@namespace SomaUI
+@using System.Collections.Concurrent
+@using System.Globalization
+@using System.Linq.Expressions
+
+@if (Chart?.Scaled == true)
+{
+    @if (Context?.XBandScale != null && Context?.YScale != null)
+    {
+        <g class="chart-line-series" @key="@($"line-{DataKey}-{Context.__Version}")">
+            @{
+                var points = BuildPoints();
+                var pathD = CurveFactory.LinePath(points, Type);
+                var strokeColor = !string.IsNullOrEmpty(Stroke) ? Stroke : $"var(--chart-{DataKey})";
+                var pathLength = EstimatePathLength(points);
+
+                if (Chart?.Config is not null)
+                {
+                    if (Chart?.Config?.TryGetValue(DataKey, out ChartConfigEntry? entry) == true && entry is not null)
+                    {
+                        strokeColor = entry.Color;
+                    }
+                }
+            }
+
+            <path d="@pathD"
+                  fill="none"
+                  stroke="@strokeColor"
+                  stroke-width="@F(StrokeWidth)"
+                  stroke-dasharray="@(Animate ? null : "0 6")"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="@(Animate ? "chart-line-animate" : "")"
+                  style="@(Animate ? $"--path-length: {F(pathLength)};" : "")" />
+
+            @if (Dot)
+            {
+                @for (int i = 0; i < points.Count; i++)
+                {
+                    var p = points[i];
+                    var isActive = Context.ActiveIndex == i;
+                    var r = isActive ? DotRadius * 1.5 : DotRadius;
+                    var dotDelay = Animate ? $"animation-delay: {0.3 + i * 0.08}s;" : "";
+                    var opacity = Context.ActiveIndex >= 0 ? (isActive ? "1" : "0.3") : "1";
+
+                    <circle cx="@F(p.X)"
+                            cy="@F(p.Y)"
+                            r="@F(r)"
+                            fill="@(isActive ? "white" : strokeColor)"
+                            stroke="hsl(var(--background))"
+                            opacity="@opacity"
+                            stroke-width="2"
+                            class="@($"{(Animate ? "chart-fade-animate" : "")}")"
+                            style="@dotDelay" />
+
+                    @if (p.X > 0)
+                    {
+                        var labelX = p.X;
+                        var labelY = p.Y - 6;
+                        @(RenderLabelText(labelX, labelY, DataAccessor.GetDouble(Context.Data[i], DataKey).ToString(), Context.__Version, i, opacity))
+                    }
+                }
+            }
+        </g>
+    }
+}
+
+@code {
+    [CascadingParameter(Name = "_context")]
+    private ChartContext? Context { get; set; }
+
+    [CascadingParameter] internal ChartDisplay? Chart { get; set; }
+
+    [Parameter, EditorRequired]
+    public string DataKey { get; set; } = "";
+
+    [Parameter]
+    public CurveType Type { get; set; } = CurveType.Monotone;
+
+    [Parameter]
+    public string? Stroke { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; } = 2;
+
+    [Parameter]
+    public string? StrokeDasharray { get; set; }
+
+    [Parameter]
+    public bool Dot { get; set; } = true;
+
+    [Parameter]
+    public double DotRadius { get; set; } = 3;
+
+    [Parameter]
+    public bool Animate { get; set; } = true;
+
+    [Parameter]
+    public bool Trendline { get; set; } = false;
+
+    private class TestData {
+        public double Amount { get; set; }
+    }
+
+
+
+    private List<TestData> Test = [new() { Amount = 200 }, new() { Amount = 230 }, new() { Amount = 120 }];
+
+    private List<(double X, double Y)> BuildPoints() {
+        if (Context?.XBandScale == null || Context.YScale == null)
+            return [];
+
+        var data = Context.Data;
+        var xKey = Context.XDataKey ?? "name";
+        var points = new List<(double X, double Y)>();
+
+        for (int i = 0; i < data.Count; i++)
+        {
+            var item = data[i];
+            var cat = DataAccessor.GetString(item, xKey);
+            var value = DataAccessor.GetDouble(item, DataKey);
+            var x = Context.XBandScale.ScaleCenter(cat);
+            var y = Context.YScale.Scale(value);
+            points.Add((x, y));
+        }
+
+
+        List<double> values = [];
+        foreach (var item in Test)
+        {
+            var getter = Getter<TestData, double>(item, (v) => v.Amount);
+            values.Add(getter);
+            var refl = CreateGetter<double>(item, "Amount");
+            var a = refl(item);
+            var b = GetValue(item, "Amount");
+
+            var c = 1;
+        }
+
+        if (Trendline)
+        {
+            var (Slope, Intercept) = CalculateLineOfBestFit(points);
+            var trendline = points.Select(x => (x.X, (Slope * x.X) + Intercept)).ToList();
+            return trendline;
+        }
+        return points;
+    }
+
+    public static (double Slope, double Intercept) CalculateLineOfBestFit(IEnumerable<(double X, double Y)> points) {
+        int n = points.Count();
+        if (n == 0)
+            throw new ArgumentException("At least one point is required.", nameof(points));
+
+        double sumX = 0;
+        double sumY = 0;
+
+        foreach (var p in points)
+        {
+            sumX += p.X;
+            sumY += p.Y;
+        }
+
+        double meanX = sumX / n;
+        double meanY = sumY / n;
+
+        double numerator = 0;
+        double denominator = 0;
+
+        foreach (var p in points)
+        {
+            double diffX = p.X - meanX;
+            double diffY = p.Y - meanY;
+            numerator += diffX * diffY;
+            denominator += diffX * diffX;
+        }
+
+        if (denominator == 0)
+            throw new InvalidOperationException("All X values are identical; slope is undefined.");
+
+        double slope = numerator / denominator;
+        double intercept = meanY - (slope * meanX);
+
+        return (slope, intercept);
+    }
+
+    private static double EstimatePathLength(List<(double X, double Y)> points) {
+        double length = 0;
+        for (int i = 1; i < points.Count; i++)
+        {
+            var dx = points[i].X - points[i - 1].X;
+            var dy = points[i].Y - points[i - 1].Y;
+            length += Math.Sqrt(dx * dx + dy * dy);
+        }
+        return length * 1.2;
+    }
+
+    public static Func<object, T> CreateGetter<T>(object data, string propertyName) {
+        var type = data.GetType();
+        var arg = Expression.Parameter(typeof(object));
+        var body = Expression.Convert(Expression.Property(Expression.Convert(arg, type), propertyName), typeof(T));
+        return Expression.Lambda<Func<object, T>>(body, arg).Compile();
+    }
+
+    public static object? GetValue(object? value, string path) {
+        if (value == null)
+            return null;
+        Type current = value.GetType();
+        foreach (var propertyName in path.Split("."))
+        {
+            var property = current.GetProperty(propertyName);
+            if (property != null)
+            {
+                if (value == null)
+                    return null;
+                value = property.GetValue(value, null);
+                current = value?.GetType() ?? property.PropertyType;
+            }
+        }
+        return value;
+    }
+
+    public static TValue Getter<T, TValue>(T data, Func<T, TValue> propertyName) {
+        return propertyName(data);
+    }
+
+    private static MarkupString RenderLabelText(double x, double y, string content, int dataVersion, int index, string opacity) {
+        var xStr = x.ToString("G6", CultureInfo.InvariantCulture);
+        var yStr = y.ToString("G6", CultureInfo.InvariantCulture);
+        var encoded = System.Net.WebUtility.HtmlEncode(content);
+        return new MarkupString(
+            $"<text chart-label x=\"{xStr}\" y=\"{yStr}\" text-anchor=\"middle\" " +
+            $"font-size=\"12\" fill=\"currentColor\" class=\"chart-fade-animate\" " +
+            $"opacity=\"{opacity}\" " +
+            $"style=\"animation-delay: {index * 0.05}s;\">{encoded}</text>");
+    }
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+}

@@ -1,0 +1,11 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<section container @attributes="Attributes" full="@Maximise">
+    @ChildContent
+</section>
+
+
+@code {
+    [Parameter] public bool Maximise { get; set; }
+}

@@ -1,0 +1,156 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+@implements IDisposable
+
+<div tooltip @ref="Element">
+    <CascadingValue Value="Context" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [Inject] private TooltipInteractionService Service { get; set; } = default!;
+
+    [Parameter] public bool DefaultOpem { get; set; }
+    [Parameter] public bool? Open { get; set; }
+    [Parameter] public string Placement { get; set; } = "top";
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+    [Parameter] public int Delay { get; set; } = 700;
+    [Parameter] public int HideDelay { get; set; } = 0;
+
+    internal TooltipContext Context = new();
+    internal ControllableState<bool> State = null!;
+
+    private System.Timers.Timer? _showTimer;
+    private System.Timers.Timer? _hideTimer;
+
+    internal bool IsOpen { get; set; }
+    internal bool RenderContent { get; private set; }
+    internal int EffectiveDelay => Service.Interactive ? 0 : Delay;
+
+    private Action? _changeHandler;
+    private bool _disposed;
+
+    protected override void OnInitialized() {
+        State = new(DefaultOpem) {
+            ControlledValue = Open.HasValue ? Open.Value : DefaultOpem,
+            OnValueChanged = OpenChanged,
+            Controlled = true
+        };
+
+        Context.State.IsOpen = false;
+        Context.State.Placement = Placement;
+        Context.OnStateChange += HandleContextStateChanged;
+        if (State.Value)
+        {
+            _ = SetOpen(true);
+        }
+        Service.OnInteraction += () => InvokeAsync(StateHasChanged);
+    }
+
+    protected override void OnParametersSet() {
+        if (State.Controlled && Open.HasValue)
+        {
+            State.ControlledValue = Open.Value;
+            Context.State.IsOpen = Open.Value;
+        }
+        if (Context.State.Placement != Placement)
+            Context.SetPlacement(Placement);
+    }
+
+    private void HandleContextStateChanged() {
+        var intentOpen = Context.State.IsOpen;
+        if (!intentOpen && _showTimer != null)
+        {
+            CancelTimers();
+            return;
+        }
+
+        if (intentOpen != State.Value)
+        {
+            Context.State.IsOpen = State.Value;
+            _ = SetOpen(intentOpen);
+            Service.NotifyOpen();
+        }
+    }
+
+    private async Task SetOpen(bool open) {
+        CancelTimers();
+
+        if (open)
+        {
+            if (EffectiveDelay > 0)
+            {
+                _showTimer = new System.Timers.Timer(EffectiveDelay);
+                _showTimer.Elapsed += async (sender, e) => {
+                    await InvokeAsync(async () => {
+                        Context.State.IsOpen = true;
+                        await State.SetValueAsync(true);
+                        StateHasChanged();
+                    });
+
+                    _showTimer?.Dispose();
+                    _showTimer = null;
+                };
+                _showTimer.AutoReset = false;
+                _showTimer.Start();
+            }
+            else
+            {
+                Context.State.IsOpen = true;
+                await State.SetValueAsync(true);
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            if (HideDelay > 0)
+            {
+                _hideTimer = new System.Timers.Timer(HideDelay);
+                _hideTimer.Elapsed += async (sender, e) => {
+                    await InvokeAsync(async () => {
+                        Context.State.IsOpen = false;
+                        await State.SetValueAsync(false);
+                        StateHasChanged();
+                    });
+
+                    _hideTimer?.Dispose();
+                    _hideTimer = null;
+                };
+                _hideTimer.AutoReset = false;
+                _hideTimer.Start();
+            }
+            else
+            {
+                Context.State.IsOpen = false;
+                await State.SetValueAsync(false);
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void CancelTimers() {
+        if (_showTimer != null)
+        {
+            _showTimer.Stop();
+            _showTimer.Dispose();
+            _showTimer = null;
+        }
+
+        if (_hideTimer != null)
+        {
+            _hideTimer.Stop();
+            _hideTimer.Dispose();
+            _hideTimer = null;
+        }
+    }
+
+    public override void Dispose() {
+        if (!_disposed)
+        {
+            CancelTimers();
+            Context.OnStateChange -= HandleContextStateChanged;
+            _disposed = true;
+        }
+    }
+}

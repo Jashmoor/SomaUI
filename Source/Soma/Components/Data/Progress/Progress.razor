@@ -1,0 +1,22 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div progress-bar @attributes="Attributes">
+    <CascadingValue Value="@Value" Name="ProgressValue">
+        @ChildContent
+    </CascadingValue>
+    <div progress-track>
+        <div progress-indicator
+             indeterminate="@Indeterminate"
+             auto="@(Auto is not null)"
+             data-auto="@Auto"
+             style="width: @(Value / (double)Max * 100)%;" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Value { get; set; } = 60;
+    [Parameter] public int Max { get; set; } = 100;
+    [Parameter] public bool Indeterminate { get; set; } = false;
+    [Parameter] public int? Auto { get; set; }
+}

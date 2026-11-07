@@ -1,0 +1,156 @@
+﻿@page "/Charts"
+
+<Container>
+
+    <ChartDisplay Config="@config" theme="monotone">
+        <LineSeries Data="@data" XDataKey="month">
+            <CartesianGrid Vertical="true" Horizontal="false" />
+            <Line DataKey="desktop" Type="CurveType.Natural" Animate />
+            <Line DataKey="mobile" Type="CurveType.Monotone" Animate />
+            <XAxis />
+            <YAxis />
+            <ChartTooltip />
+        </LineSeries>
+    </ChartDisplay>
+
+    <ChartDisplay Config="@config" theme="monotone">
+        <LineSeries Data="@data" XDataKey="month">
+            <CartesianGrid Vertical="true" Horizontal="true" />
+            <Line DataKey="desktop" Type="CurveType.Step" Animate />
+            <Line DataKey="mobile" Type="CurveType.Linear" Animate />
+            <XAxis />
+            <ChartTooltip />
+        </LineSeries>
+    </ChartDisplay>
+
+    <ChartDisplay Config="@config">
+        <AreaChart Data="@data" XDataKey="month">
+            <CartesianGrid Vertical="false" Horizontal="true" />
+            <Area DataKey="desktop" Gradient Fill="var(--color-neutral-300)" />
+            <Line DataKey="mobile" Type="CurveType.Linear" />
+            <Line DataKey="mobile" Trendline Animate="false" />
+            <Area DataKey="other" Gradient Fill="var(--color-neutral-400)" />
+            <XAxis AxisLine="false" TickLine="true" />
+            <YAxis />
+            <ChartTooltip />
+        </AreaChart>
+    </ChartDisplay>
+
+    <div style="display: flex; justify-content: space-between;">
+
+        <ChartDisplay Config="@config">
+            <BarChart Data="@data" XDataKey="month" Layout="BarLayout.Horizontal">
+                <CartesianGrid Vertical="true" Horizontal="true" />
+                <Bar DataKey="desktop" Radius="7" Label="true" Fill="var(--primary-400)" />
+                <Bar DataKey="mobile" Radius="7" Label="true" Fill="var(--primary-200)" />
+                <Bar DataKey="other" Radius="7" Label="true" Fill="var(--color-neutral-400)" />
+                <XAxis />
+                <YAxis />
+                <ChartTooltip />
+            </BarChart>
+        </ChartDisplay>
+
+        <ChartDisplay Config="@pieconfig">
+            <Pie DataKey="visitors" NameKey="browser" Data="@pieData" Label="true" LabelFormat="@((e) => $"££ {e}")" />
+            <ChartTooltip />
+        </ChartDisplay>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+        <ChartDisplay Config="@pieconfig">
+            <Pie DataKey="visitors" NameKey="browser" Data="@pieData" Label="false" />
+            <ChartTooltip />
+        </ChartDisplay>
+
+        <ChartDisplay Config="@pieconfig">
+            <Pie DataKey="visitors" NameKey="browser" Data="@pieData" Label="true" />
+        </ChartDisplay>
+    </div>
+
+    <div style="display: flex; gap: 1rem;">
+
+        <Card style="min-inline-size: var(--container-sm);">
+            <CardHeader>
+                <CardTitle>Chart Card</CardTitle>
+                <CardDescription>Display information inside a card</CardDescription>
+                <CardAction>
+                    <Button>Action</Button>
+                </CardAction>
+            </CardHeader>
+            <CardContent>
+                <ChartDisplay Config="@config">
+                    <RadialChart Data="@data" DataKey="desktop">
+                        <CenterContent>
+                            <Item>
+                                <ItemContent>
+                                    <ItemTitle>Radial</ItemTitle>
+                                </ItemContent>
+                            </Item>
+                        </CenterContent>
+                    </RadialChart>
+                    <ChartTooltip />
+                </ChartDisplay>
+            </CardContent>
+            <CardFooter>
+                <Button>Chart</Button>
+            </CardFooter>
+        </Card>
+
+        <Card style="min-inline-size: var(--container-sm);">
+            <CardHeader>
+                <CardTitle>Chart Card</CardTitle>
+                <CardDescription>Display information inside a card</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartDisplay Config="@config">
+                    <LineSeries Data="@data" XDataKey="month">
+                        <CartesianGrid Vertical="false" />
+                        <Line DataKey="desktop" Stroke="var(--secondary-500)" Type="CurveType.Linear" Animate />
+                        <Line DataKey="mobile" Stroke="var(--secondary-700)" Type="CurveType.Natural" Animate />
+                    </LineSeries>
+                </ChartDisplay>
+            </CardContent>
+        </Card>
+    </div>
+
+</Container>
+
+@code {
+    private ChartConfig config => new ChartConfig {
+        ["desktop"] = new ChartConfigEntry { Label = "Desktop", Color = "var(--primary-400)" },
+        ["mobile"]  = new ChartConfigEntry { Label = "Mobile", Color = "var(--tertiary-500)" },
+        ["other"] = new ChartConfigEntry { Label = "Other", Color = "var(--secondary-600)" }
+    };
+
+    private IReadOnlyList<object> data = new List<Dictionary<string, object>>
+{
+    new() { ["month"] = "January",  ["desktop"] = 300, ["mobile"] = 80, ["other"] = 170 },
+    new() { ["month"] = "February", ["desktop"] = 20, ["mobile"] = 200, ["other"] = 290 },
+        new() { ["month"] = "March",  ["desktop"] = 180, ["mobile"] = 230, ["other"] = 170 },
+    new() { ["month"] = "April", ["desktop"] = 100, ["mobile"] = 100, ["other"] = 190 },
+        new() { ["month"] = "May",  ["desktop"] = 286, ["mobile"] = 30, ["other"] = 100 },
+    new() { ["month"] = "June", ["desktop"] = 120, ["mobile"] = 250, ["other"] = 50 },
+        new() { ["month"] = "July",  ["desktop"] = 180, ["mobile"] = 230, ["other"] = 60 },
+    new() { ["month"] = "August", ["desktop"] = 200, ["mobile"] = 200, ["other"] = 180 },
+}.Cast<object>().ToList();
+
+
+
+
+    private ChartConfig pieconfig = new ChartConfig {
+        ["chrome"]  = new ChartConfigEntry { Label = "Chrome", Color = "var(--secondary-200)" },
+        ["safari"]  = new ChartConfigEntry { Label = "Safari", Color = "var(--primary-400)" },
+        ["firefox"] = new ChartConfigEntry { Label = "Firefox", Color = "var(--secondary-600)" },
+        ["edge"]    = new ChartConfigEntry { Label = "Edge", Color = "var(--primary-800)" },
+        ["other"]   = new ChartConfigEntry { Label = "Other", Color = "var(--secondary-500)" }
+    };
+
+    private IReadOnlyList<object> pieData = new List<Dictionary<string, object>>
+    {
+    new() { ["browser"] = "chrome",  ["visitors"] = 275, ["fill"] = "var(--secondary-200)" },
+    new() { ["browser"] = "safari",  ["visitors"] = 200, ["fill"] = "var(--primary-400)" },
+    new() { ["browser"] = "firefox", ["visitors"] = 187, ["fill"] = "var(--secondary-600)" },
+    new() { ["browser"] = "edge",    ["visitors"] = 173, ["fill"] = "var(--primary-800)" },
+    new() { ["browser"] = "other",   ["visitors"] = 90,  ["fill"] = "var(--secondary-500)" },
+};
+}

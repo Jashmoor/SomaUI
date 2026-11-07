@@ -1,0 +1,11 @@
+﻿@namespace SomaUI.Tracing
+
+<div class="@Cn.Merge("flex flex-col text-sm [&_button]:w-full [&_button]:text-left [&_a]:block", Class)" @attributes="Attrs">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? Attrs { get; set; }
+}

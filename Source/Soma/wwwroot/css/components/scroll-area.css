@@ -1,0 +1,52 @@
+﻿[scroll-area] {
+    min-height: 0;
+    max-block-size: var(--container-lg);
+    display: flex;
+    flex: 0 0 fit-content;
+    overflow: hidden;
+    gap: inherit;
+    border-radius: inherit;
+}
+
+@property --left-fade {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --right-fade {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0;
+}
+
+@keyframes scrollfade {
+    0% {
+        --left-fade: 0;
+    }
+
+    10%, 100% {
+        --left-fade: var(--spacing-lg);
+    }
+
+    0%, 90% {
+        --right-fade: var(--spacing-lg);
+    }
+
+    100% {
+        --right-fade: 0;
+    }
+}
+
+[internal-scroll] {
+    --_mask: var(--mask, linear-gradient(to bottom, #0000, #ffff var(--left-fade) calc(100% - var(--right-fade)), #0000 ));
+    max-height: 100%;
+    width: 100%;
+    overscroll-behavior-block: contain;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    mask: var(--_mask);
+    animation: scrollfade;
+    animation-timeline: --scrollfade;
+    scroll-timeline: --scrollfade y;
+}

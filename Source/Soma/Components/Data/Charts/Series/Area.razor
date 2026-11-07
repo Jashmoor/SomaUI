@@ -1,0 +1,172 @@
+﻿@namespace SomaUI
+@using System.Globalization
+
+@if (context?.XBandScale != null && context.YScale != null)
+{
+    <g class="chart-area-series" @key="@($"area-{DataKey}-{context.__Version}")">
+        @{
+            var points = BuildPoints();
+            var baseline = context.YScale.Scale(0);
+            var areaPathD = CurveFactory.AreaPath(points, baseline, Type);
+            var linePathD = CurveFactory.LinePath(points, Type);
+            var fillColor = !string.IsNullOrEmpty(Fill) ? Fill : $"var(--chart-{DataKey})";
+            var strokeColor = !string.IsNullOrEmpty(Stroke) ? Stroke : fillColor;
+
+            // if (Chart?.Config is not null)
+            // {
+            //     if (Chart?.Config?.TryGetValue(DataKey, out ChartConfigEntry? entry) == true && entry is not null)
+            //     {
+            //         strokeColor = entry.Color;
+            //         fillColor = entry.Color;
+            //     }
+            // }
+
+
+            var gradientId = $"area-gradient-{DataKey}-{context.__Version}";
+            var pathLength = EstimatePathLength(points);
+            var lineAnimClass = Animate ? "chart-line-animate" : "";
+            var lineAnimStyle = Animate ? $"--path-length: {F(pathLength)};" : "";
+            var fillAnimClass = Animate ? "chart-area-animate" : "";
+        }
+
+        @if (Gradient)
+        {
+            <defs>
+                <linearGradient id="@gradientId" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="@fillColor" stop-opacity="0.8" />
+                    <stop offset="95%" stop-color="@fillColor" stop-opacity="0.1" />
+                </linearGradient>
+            </defs>
+        }
+
+        <path d="@areaPathD"
+              fill="@(Gradient ? $"url(#{gradientId})" : fillColor)"
+              fill-opacity="@F(FillOpacity)"
+              stroke="none"
+              class="@fillAnimClass" />
+
+        @if (ShowLine)
+        {
+            <path d="@linePathD"
+                  fill="none"
+                  stroke="@strokeColor"
+                  stroke-width="@F(StrokeWidth)"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="@lineAnimClass"
+                  style="@lineAnimStyle" />
+        }
+
+        @if (Dot)
+        {
+            @for (int i = 0; i < points.Count; i++)
+            {
+                var p = points[i];
+                var isActive = context.ActiveIndex == i;
+                var opacity = context.ActiveIndex >= 0 ? (isActive ? "1" : "0.3") : "1";
+                var r = isActive ? 5 : DotRadius;
+                var dotDelay = Animate ? $"animation-delay: {0.3 + i * 0.08}s;" : "";
+
+                <circle active="@isActive"
+                        cx="@F(p.X)"
+                        cy="@F(p.Y)"
+                        r="@F(r)"
+                        fill="@(strokeColor)"
+                        stroke="hsl(var(--background))"
+                        stroke-width="2"
+                        class="@($"transition-all duration-200 {(Animate ? "chart-fade-animate" : "")}")"
+                        style="@dotDelay" />
+
+                @if (p.X > 0)
+                {
+                    var labelX = p.X;
+                    var labelY = p.Y - 6;
+                    @(RenderLabelText(labelX, labelY, DataAccessor.GetDouble(context.Data[i], DataKey).ToString(), context.__Version, i, opacity))
+                }
+            }
+        }
+    </g>
+}
+
+@code {
+    [CascadingParameter(Name = "_context")]
+    private ChartContext? context { get; set; }
+
+    [CascadingParameter] internal ChartDisplay Chart { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string DataKey { get; set; } = "";
+
+    [Parameter]
+    public CurveType Type { get; set; } = CurveType.Monotone;
+
+    [Parameter]
+    public string? Fill { get; set; }
+
+    [Parameter]
+    public string? Stroke { get; set; }
+
+    [Parameter]
+    public double StrokeWidth { get; set; } = 2;
+
+    [Parameter]
+    public double FillOpacity { get; set; } = 0.4;
+
+    [Parameter]
+    public bool Gradient { get; set; } = false;
+
+    [Parameter]
+    public bool ShowLine { get; set; } = true;
+
+    [Parameter]
+    public bool Dot { get; set; } = true;
+
+    [Parameter]
+    public double DotRadius { get; set; } = 2;
+
+    [Parameter]
+    public bool Animate { get; set; } = true;
+
+    private List<(double X, double Y)> BuildPoints() {
+        if (context?.XBandScale == null || context.YScale == null) return [];
+
+        var data = context.Data;
+        var xKey = context.XDataKey ?? "name";
+        var points = new List<(double X, double Y)>();
+
+        for (int i = 0; i < data.Count; i++)
+        {
+            var cat = DataAccessor.GetString(data[i], xKey);
+            var value = DataAccessor.GetDouble(data[i], DataKey);
+            var x = context.XBandScale.ScaleCenter(cat);
+            var y = context.YScale.Scale(value);
+            points.Add((x, y));
+        }
+
+        return points;
+    }
+
+    private static double EstimatePathLength(List<(double X, double Y)> points) {
+        double length = 0;
+        for (int i = 1; i < points.Count; i++)
+        {
+            var dx = points[i].X - points[i - 1].X;
+            var dy = points[i].Y - points[i - 1].Y;
+            length += Math.Sqrt(dx * dx + dy * dy);
+        }
+        return length * 1.2;
+    }
+
+    private static MarkupString RenderLabelText(double x, double y, string content, int dataVersion, int index, string opacity) {
+        var xStr = x.ToString("G6", CultureInfo.InvariantCulture);
+        var yStr = y.ToString("G6", CultureInfo.InvariantCulture);
+        var encoded = System.Net.WebUtility.HtmlEncode(content);
+        return new MarkupString(
+            $"<text chart-label x=\"{xStr}\" y=\"{yStr}\" text-anchor=\"middle\" " +
+            $"font-size=\"12\" fill=\"currentColor\" class=\"chart-fade-animate\" " +
+            $"opacity=\"{opacity}\" " +
+            $"style=\"animation-delay: {index * 0.05}s;\">{encoded}</text>");
+    }
+
+    private static string F(double v) => v.ToString("G6", CultureInfo.InvariantCulture);
+}

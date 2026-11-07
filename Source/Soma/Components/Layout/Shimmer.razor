@@ -1,0 +1,9 @@
+﻿@namespace SomaUI
+
+<p shimmer>
+    @ChildContent
+</p>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+}

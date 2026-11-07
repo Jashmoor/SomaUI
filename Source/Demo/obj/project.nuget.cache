@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "6RpXxr22NSI=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\joseph.cashmore\\source\\repos\\ComponentLibrary\\Source\\Demo\\TestBench.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\joseph.cashmore\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.11\\microsoft.aspnetcore.app.internal.assets.10.0.11.nupkg.sha512"
+  ],
+  "logs": []
+}

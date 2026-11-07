@@ -1,0 +1,15 @@
+﻿@namespace SomaUI
+@typeparam T
+@inherits RadioItem<T>
+@implements IDisposable
+
+<div radio-option @onclick="OnClick" @onclick:stopPropagation="true">
+    <span radio-dummy checked="@IsChecked"></span>
+    <label for="@Id" field-label>@Label</label>
+</div>
+
+@if (EditContext != null && Value is not null)
+{
+    <input id="@Id" hidden type="radio" value="@Value.ToString()" />
+}
+

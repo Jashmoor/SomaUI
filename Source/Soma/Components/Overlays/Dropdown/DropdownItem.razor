@@ -1,0 +1,32 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<li dropdown-item @attributes="Attributes" @onclick="OnClickHandler" shimmer="@Loading">
+    <span>
+        @ChildContent
+    </span>
+</li>
+
+@code {
+    [CascadingParameter] internal DropdownContext Context { get; set; } = default!;
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; } = default!;
+    private bool Loading = false;
+
+    public async Task OnClickHandler(MouseEventArgs args) {
+        try
+        {
+            Loading = true;
+            await InvokeAsync(StateHasChanged);
+
+            if (OnClick.HasDelegate)
+                await OnClick.InvokeAsync(args);
+            Context.Close();
+        }
+        finally
+        {
+            Loading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}
+

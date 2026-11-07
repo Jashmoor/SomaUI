@@ -1,0 +1,32 @@
+﻿@namespace SomaUI
+@using Microsoft.AspNetCore.Components.Sections
+@implements IDisposable
+
+<SectionOutlet SectionId="@Tooltip" />
+<SectionOutlet SectionId="@Popover" />
+<SectionOutlet SectionId="@Dropdown" />
+
+@* @foreach(var item in Service.Content)
+{
+    @item.content
+} *@
+
+
+@code {
+    [Inject] private FloatingContentService Service { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        Service.StateChange += StateHasChanged;
+        base.OnInitialized();
+    }
+
+    public void Dispose()
+    {
+        Service.StateChange -= StateHasChanged;
+    }
+
+    internal static readonly object Tooltip = new();
+    internal static readonly object Popover = new();
+    internal static readonly object Dropdown = new();
+}

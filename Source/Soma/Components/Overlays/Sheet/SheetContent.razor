@@ -1,0 +1,33 @@
+﻿@namespace SomaUI
+@inherits BaseComponent
+
+@if (Sheet?.Open == true)
+{
+    <div role="dialog" dialog id="@UniqueID" style="z-index: @(ZIndex);">
+        <div overlay @onclick="HandleOverlayClose" show="@Sheet.Open" closing="@Sheet.Closing" />
+        <div sheet-container role="dialog" aria-modal="true" show="@(!Sheet.Closing)" side="@SheetLocation" @attributes="Attributes">
+            @ChildContent
+        </div>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public Sheet? Sheet { get; set; }
+    [Parameter] public SheetSide Side { get; set; }
+    [Parameter] public int ZIndex { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+    [Parameter] public SheetOptions Options { get; set; } = new();
+
+    private string SheetLocation
+        => Side.ToString().ToLower();
+
+    private async Task HandleOverlayClose() {
+        if (Options.Dismissable && Sheet is not null)
+            await Sheet.SetOpen(false);
+    }
+
+    private async Task HandleClose() {
+        if (Sheet is not null)
+            await Sheet.SetOpen(false);
+    }
+}

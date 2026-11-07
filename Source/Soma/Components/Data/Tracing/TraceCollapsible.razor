@@ -1,0 +1,26 @@
+﻿@namespace SomaUI.Tracing
+
+<CascadingValue Value="this" IsFixed="true">
+    <div class="@Class" data-state="@(IsOpen ? "open" : "closed")">@ChildContent</div>
+</CascadingValue>
+
+@code {
+    [Parameter] public bool? Open { get; set; }
+    [Parameter] public bool DefaultOpen { get; set; }
+    [Parameter] public EventCallback<bool?> OpenChanged { get; set; }   // bool? so @bind-Open works
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private bool _internalOpen;
+
+    public string ContentId { get; } = $"trace-{Guid.NewGuid():N}";
+    public bool IsOpen => Open ?? _internalOpen;
+
+    protected override void OnInitialized() => _internalOpen = DefaultOpen;
+
+    public async Task ToggleAsync() {
+        var next = !IsOpen;
+        if (Open is null) _internalOpen = next;     // uncontrolled: we own it
+        await OpenChanged.InvokeAsync(next);        // controlled: parent decides
+    }
+}

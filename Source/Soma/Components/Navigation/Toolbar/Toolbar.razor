@@ -1,0 +1,10 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<nav toolbar border="@Border">
+    @ChildContent
+</nav>
+
+@code {
+    [Parameter] public bool Border { get; set; }
+}

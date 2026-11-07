@@ -1,0 +1,48 @@
+﻿@namespace SomaUI
+@using System.Timers
+@inherits BaseWithChildComponent
+@implements IDisposable
+
+<span tooltip-trigger
+      @ref="Trigger"
+      @onmouseenter="HandleMouseEnter"
+      @onmouseleave="HandleMouseLeave"
+      @onfocus="HandleFocus"
+      @onblur="HandleBlur"
+      @onclick="HandleBlur"
+      tabindex="0">
+    @ChildContent
+</span>
+
+@code {
+    [CascadingParameter] internal TooltipContext TooltipContext { get; set; } = default!;
+    [Parameter] public EventCallback<MouseEventArgs> OnMouseEnter { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnMouseLeave { get; set; }
+
+    private ElementReference Trigger;
+    private Timer? Timer;
+
+    private async Task HandleMouseEnter(MouseEventArgs args) {
+        TooltipContext.Open(Trigger);
+        if (OnMouseEnter.HasDelegate)
+            await OnMouseEnter.InvokeAsync(args);
+    }
+
+    private async Task HandleMouseLeave(MouseEventArgs args) {
+        TooltipContext.Close();
+        if (OnMouseLeave.HasDelegate)
+            await OnMouseLeave.InvokeAsync(args);
+    }
+
+    private async Task HandleFocus() {
+        TooltipContext.Close();
+    }
+
+    private async Task HandleBlur() {
+        TooltipContext.Close();
+    }
+
+    protected override void OnAfterRender(bool firstRender) {
+        TooltipContext.SetTriggerElement(Trigger);
+    }
+}

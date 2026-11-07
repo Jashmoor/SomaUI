@@ -1,0 +1,15 @@
+﻿@namespace SomaUI.Tracing
+
+@if (Root.IsOpen || KeepMounted)
+{
+    <div id="@Root.ContentId" hidden="@(!Root.IsOpen)" class="@Cn.Merge("ml-2 border-l pl-4 text-muted-foreground", Class)">
+        @ChildContent
+    </div>
+}
+
+@code {
+    [CascadingParameter] private TraceCollapsible Root { get; set; } = default!;
+    [Parameter] public bool KeepMounted { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+}

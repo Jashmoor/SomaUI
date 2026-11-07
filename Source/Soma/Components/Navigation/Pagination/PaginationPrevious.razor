@@ -1,0 +1,25 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<PaginationLink Disabled="@Disabled" OnClick="HandleClick">
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z" /></svg>
+</PaginationLink>
+
+@code {
+    [CascadingParameter] internal PaginationContext? Context { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private async Task HandleClick() {
+        if (Context?.State?.CanGoPrevious != true)
+            return;
+        if (Context?.State is not null)
+        {
+            var previous = Math.Max(Context.State.CurrentPage - 1, 1);
+            if (Context.OnPageChanged is not null)
+                await Context.OnPageChanged(previous);
+        }
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+}

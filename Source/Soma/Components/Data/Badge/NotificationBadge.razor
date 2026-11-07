@@ -1,0 +1,26 @@
+﻿@namespace SomaUI
+@using System.Globalization
+@inherits BaseWithChildComponent
+
+<div @ref="Element" badge-container @attributes="Attributes">
+    @ChildContent
+    @if (Visible)
+    {
+        <span notification-badge data-position="@Location.ToString().ToLower()" animate fade-in-up>
+            @(Dot ? null : Display)
+        </span>
+    }
+</div>
+
+@code {
+    [Parameter] public int? Count { get; set; }
+    [Parameter] public bool ShowZero { get; set; }
+    [Parameter] public int Maximum { get; set; } = 99;
+    [Parameter] public bool Dot { get; set; }
+    [Parameter] public BadgeLocation Location { get; set; } = BadgeLocation.Default;
+
+    private bool Visible => Dot || (Count.HasValue && (Count > 0 || ShowZero));
+    public string Display => Count > Maximum
+        ? $"{Maximum}+"
+        : Count?.ToString(CultureInfo.CurrentCulture) ?? "";
+}

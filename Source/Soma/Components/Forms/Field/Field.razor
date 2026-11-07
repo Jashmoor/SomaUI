@@ -1,0 +1,53 @@
+﻿@namespace SomaUI
+@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Components.Forms
+@inherits BaseWithChildComponent
+@implements IDisposable
+@typeparam T
+
+<CascadingValue Value="this" Name="ParentField" IsFixed="true">
+    <CascadingValue Value="For" IsFixed="true">
+        <CascadingValue Value="FieldContext" IsFixed="true">
+            <div field disabled="@Disabled">
+                @ChildContent
+            </div>
+        </CascadingValue>
+    </CascadingValue>
+</CascadingValue>
+
+@code {
+    [Parameter] public bool Disabled { get; set; } = false;
+    [Parameter] public Expression<Func<T>>? For { get; set; }
+    [CascadingParameter] public EditContext? EditContext { get; set; }
+
+    private readonly FieldContext FieldContext = new();
+
+    protected override void OnInitialized() {
+        FieldContext.StateChange += HandleStateChange;
+        base.OnInitialized();
+    }
+
+    public override Task SetParametersAsync(ParameterView parameters) {
+        var result = base.SetParametersAsync(parameters);
+
+        if (EditContext != null && For != null)
+        {
+            EditContext.OnValidationStateChanged -= ValidationStateChanged;
+            EditContext.OnValidationStateChanged += ValidationStateChanged;
+        }
+
+        return result;
+    }
+
+    private void HandleStateChange()
+        => InvokeAsync(StateHasChanged);
+
+    private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
+        => HandleStateChange();
+
+    public override void Dispose() {
+        FieldContext.StateChange -= HandleStateChange;
+        EditContext?.OnValidationStateChanged -= ValidationStateChanged;
+        base.Dispose();
+    }
+}

@@ -1,0 +1,18 @@
+﻿@import url('./typography.css');
+@import url('./spacing.css');
+@import url('./color.css');
+
+:root, :host {
+    --top: env(safe-area-inset-top);
+    --bottom: env(safe-area-inset-bottom);
+    --left: env(safe-area-inset-left);
+    --right: env(safe-area-inset-right);
+
+    @media (prefers-color-scheme: dark) {
+        color-scheme: dark;
+    }
+
+    @media (prefers-color-scheme: light) or (prefers-color-scheme: no-preference) {
+        color-scheme: light;
+    }
+}

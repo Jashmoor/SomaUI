@@ -1,0 +1,11 @@
+﻿@namespace SomaUI.Tracing
+
+<span class="@Cn.Merge("truncate", Running ? "animate-pulse motion-reduce:animate-none" : null, Class)">@ChildContent</span>
+
+@code {
+    [CascadingParameter(Name = "TraceLineStatus")] public TraceStatus Status { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private bool Running => Status == TraceStatus.Running;
+}

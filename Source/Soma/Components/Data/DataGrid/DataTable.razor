@@ -1,0 +1,308 @@
+﻿@namespace SomaUI
+@inherits BaseComponent
+@typeparam TItem
+
+<figure data-grid>
+    <CascadingValue Value="Context" IsFixed="true">
+        @{
+            Context.BeginColumnIngestion();
+        }
+        @ChildContent
+        <Defer>
+            @{
+                Context.IngestionComplete();
+            }
+            @if (Context.Categorys.Any())
+            {
+                <Tabs ValueChanged="UpdateCategory" Default="" style="padding-block-end: 0;">
+                    <TabsList>
+                        <TabsTrigger Value="">All</TabsTrigger>
+                        @foreach (var cat in Context.Categorys)
+                        {
+                            <TabsTrigger Value="@cat.Title">@cat.Title</TabsTrigger>
+                        }
+                    </TabsList>
+                </Tabs>
+            }
+            <div style="display: flex; justify-content: flex-start; align-items: center; padding-inline: var(--spacing); gap: var(--spacing-sm); padding-inline-end: 0;">
+                <Search @bind-Value="@FilterValue" @bind-Value:after="ProcessData" Label="search ..." style="margin-inline-end: auto;">
+                    <Icon>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor"><path d="M120-240v-80h240v80H120Zm0-200v-80h480v80H120Zm0-200v-80h720v80H120Z"></path></svg>
+                    </Icon>
+                </Search>
+                <Popover>
+                    @if (_selectedItems.Any())
+                    {
+                        <PopoverTrigger>
+                            <span>@_selectedItems.Count Selected</span>
+                        </PopoverTrigger>
+                    }
+                    <PopoverContent>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Actions</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ul>
+                                    <li>Delete</li>
+                                    <li>Move</li>
+                                    <li>Rename</li>
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    </PopoverContent>
+                </Popover>
+                <div style="margin-inline-start: auto; display: flex; gap: inherit;">
+                    <Popover>
+                        <PopoverTrigger>
+                            <Tooltip Delay="2000">
+                                <TooltipTrigger>
+                                    <Button>Summary</Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <span>View Summary</span>
+                                </TooltipContent>
+                            </Tooltip>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Table Summary</CardTitle>
+                                    <CardDescription>A brief summary of the data</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <ul>
+                                        <li>@Context.State.PaginationState.CurrentPage</li>
+                                        <li>@Context.State.SortingState.ActiveCategory</li>
+                                        <li>@Context.State.SortingState.ActiveColumn</li>
+                                        <li>@Context.State.SortingState.SortDirection.ToString()</li>
+                                    </ul>
+
+                                </CardContent>
+                            </Card>
+                        </PopoverContent>
+                    </Popover>
+                    @if (Context.Columns.Where(x => x.Sortable).Any())
+                    {
+                        <Dropdown>
+                            <DropdownTrigger>
+                                <Tooltip Delay="2000">
+                                    <TooltipTrigger>
+                                        <Button>Sort</Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <span>Apply Sorting</span>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </DropdownTrigger>
+                            <DropdownContent>
+                                @foreach (var col in Context.Columns.Where(x => x.Sortable))
+                                {
+                                    <DropdownItem OnClick="async () => await ToggleSort(col.Title)">
+                                        @col.Title
+                                    </DropdownItem>
+                                }
+                            </DropdownContent>
+                        </Dropdown>
+                    }
+                    <Dropdown>
+                        <DropdownTrigger>
+                            <Tooltip Delay="2000">
+                                <TooltipTrigger>
+                                    <Button>Export</Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <span>Export Options</span>
+                                </TooltipContent>
+                            </Tooltip>
+                        </DropdownTrigger>
+                        <DropdownContent>
+                            <DropdownLabel>
+                                Actions
+                            </DropdownLabel>
+                            <DropdownItem OnClick="ExportAll">
+                                Export All
+                            </DropdownItem>
+                            <DropdownItem OnClick="ExportCurrent">
+                                Export Current
+                            </DropdownItem>
+                        </DropdownContent>
+                    </Dropdown>
+                </div>
+            </div>
+
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        @if (Selectable)
+                        {
+                            bool all_selected = _selectedItems.Count == Context.State.PaginationState.PageSize;
+                            <TableHead style="position: sticky; top: 0; background: var(--background); z-index: 3;">
+                                <CheckBox Checked="@all_selected" Indeterminate="@_selectedItems.Any()" ValueChanged="ToggleAll" />
+                            </TableHead>
+                        }
+                        @foreach (var col in Context.Columns)
+                        {
+                            <TableHead @key="@col" OnClick="ToggleSort" Title="@col.Title" style="position: sticky; top: 0; background: var(--background); z-index: 3;">
+                                <div style="display: flex; justify-content: flex-start; gap: 2rem; align-items: center;">
+                                    @col.Title
+                                    @if (col.Sortable)
+                                    {
+                                        <PaginationLink>
+                                            <SortIcon Column="@col" />
+                                        </PaginationLink>
+                                    }
+                                </div>
+                            </TableHead>
+                        }
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    @if (Loading)
+                    {
+                        foreach (var i in Enumerable.Range(0, Context.State.PaginationState.PageSize))
+                        {
+                            <TableRow>
+                                @foreach (var item in Context.Columns)
+                                {
+                                    <TableCell Loading>
+
+                                    </TableCell>
+                                }
+                            </TableRow>
+                        }
+                    }
+                    else
+                    {
+                        @if (GroupData is not null)
+                        {
+                            foreach (var (group, index) in Context.Grouped.Select((group, index) => (group, index)))
+                            {
+                                <ExpandingRow @key="@($"{group.Key}-{index}")" Colspan="@Context.Columns.Count" animate animate-child fade-in>
+                                    <ChildContent>
+                                        @if (GroupHeaderTemplate is not null)
+                                        {
+                                            @GroupHeaderTemplate((group, group.Count()))
+                                        }
+                                        else
+                                        {
+                                            <Item>
+                                                <ItemContent>
+                                                    <ItemTitle>
+                                                        @group.Key
+                                                    </ItemTitle>
+                                                </ItemContent>
+                                                <ItemActions>
+                                                    @group.Count()
+                                                </ItemActions>
+                                            </Item>
+                                        }
+                                    </ChildContent>
+                                    <Details>
+                                        @foreach (var (item, index) in group.Select((item, index) => (item, index)))
+                                        {
+                                            <TableRow @key="@($"{group.Key}-{index}")" animate animate-child fade-in-up>
+                                                @if (Selectable)
+                                                {
+
+                                                    bool selected = _selectedItems.Contains(item);
+                                                    <TableCell>
+                                                        <div @onclick="async () => await ToggleSelection(item)">
+                                                            <input type="checkbox" @bind-value="@selected" />
+                                                            <CheckBox @bind-Value="@selected" />
+                                                        </div>
+                                                    </TableCell>
+                                                }
+                                                @foreach (var (cell, i) in Context.Columns.Select((cell, index) => (cell, index)))
+                                                {
+                                                    @if (cell.CellTemplate is not null)
+                                                    {
+                                                        @cell.CellTemplate(item)
+                                                    }
+                                                    else
+                                                    {
+                                                        <TableCell @key="@($"cell-{i}")">
+                                                            @cell.ValueExpression(item)
+                                                        </TableCell>
+                                                    }
+                                                }
+                                            </TableRow>
+                                        }
+                                    </Details>
+                                </ExpandingRow>
+                            }
+                        }
+                        else
+                        {
+
+                            @foreach (var (item, index) in Context.Data.Select((item, index) => (item, index)))
+                            {
+                                <TableRow @key="@($"{index}-row")" animate animate-child fade-in-up>
+                                    @if (Selectable)
+                                    {
+                                        bool selected = _selectedItems.Contains(item);
+                                        <TableCell>
+                                            <CheckBox Checked="@selected" ValueChanged="async () => await ToggleSelection(item)" />
+                                        </TableCell>
+                                    }
+                                    @foreach (var (cell, index) in Context.Columns.Select((cell, index) => (cell, index)))
+                                    {
+                                        <TableCell @key="@($"cell-{index}")">
+                                            @if (cell.CellTemplate is not null)
+                                            {
+                                                @cell.CellTemplate(item)
+                                            }
+                                            else
+                                            {
+                                                @cell.ValueExpression(item)
+                                            }
+                                        </TableCell>
+                                    }
+                                </TableRow>
+                            }
+                        }
+                    }
+                </TableBody>
+                @if (GroupData is null)
+                {
+                    <TableFooter>
+                        <TableCell colspan="@Context.Columns.Count()">
+                            <Pagination State="@Context.State.PaginationState" OnPageChange="ChangePage">
+                                <PaginationContent>
+                                    <Select Placeholder="-" @bind-Value="PageSize" @bind-Value:after="ChangePageSize">
+                                        <Option Value="(int)PageSizes.Smallest" Selected></Option>
+                                        <Option Value="(int)PageSizes.Small"></Option>
+                                        <Option Value="(int)PageSizes.Default"></Option>
+                                        <Option Value="(int)PageSizes.Large"></Option>
+                                        <Option Value="(int)PageSizes.Largest"></Option>
+                                    </Select>
+                                    <PaginationItem><PaginationFirst Disabled="@(!Context.State.PaginationState.CanGoPrevious)" /></PaginationItem>
+                                    <PaginationItem><PaginationPrevious Disabled="@(!Context.State.PaginationState.CanGoPrevious)" /></PaginationItem>
+                                    <PaginationPageDisplay />
+                                    <PaginationItem><PaginationNext Disabled="@(!Context.State.PaginationState.CanGoNext)" /></PaginationItem>
+                                    <PaginationItem><PaginationLast Disabled="@(!Context.State.PaginationState.CanGoNext)" /></PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </TableCell>
+                    </TableFooter>
+                }
+            </Table>
+        </Defer>
+    </CascadingValue>
+</figure>
+
+@code {
+    private int PageSize;
+    private int TotalCount = 0;
+    private bool Loading = true;
+
+    private async Task<IReadOnlyList<TItem>> ExportAll() {
+        TotalCount = Items?.Count() ?? 0;
+        return Items?.ToList()?.AsReadOnly() ?? [];
+    }
+
+    private async Task<IReadOnlyList<TItem>> ExportCurrent() {
+        TotalCount = Context.Data.Count();
+        return Context.Data?.ToList()?.AsReadOnly() ?? [];
+    }
+}

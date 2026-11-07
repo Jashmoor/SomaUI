@@ -1,0 +1,19 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<li @attributes="Attributes" timeline-item>
+    <div timeline-indicator data-active="@(Value <= Parent.ActiveStep)">
+        @if(Icon is not null)
+        {
+            @Icon
+        }
+    </div>
+    <div timeline-separator data-active="@(Value < Parent.ActiveStep)"></div>
+    @ChildContent
+</li>
+
+@code {
+    [CascadingParameter] public Timeline Parent { get; set; } = default!;
+    [Parameter] public RenderFragment Icon { get; set; } = default!;
+    [Parameter] public int? Value { get; set; }
+}

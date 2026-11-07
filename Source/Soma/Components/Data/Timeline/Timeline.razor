@@ -1,0 +1,36 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<ol @attributes="Attributes" timeline>
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</ol>
+
+@code {
+
+    private int Step;
+
+    [Parameter] public int DefaultValue { get; set; } = 1;
+    [Parameter] public int? Value { get; set; }
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+
+    internal int ActiveStep => Value ?? Step;
+
+    protected override void OnInitialized()
+    {
+        Step = DefaultValue;
+        base.OnInitialized();
+    }
+
+    internal async Task SetActiveStep(int step)
+    {
+        if (Step == step)
+            return;
+        if (Value is null)
+            Step = step;
+        await ValueChanged.InvokeAsync(step);
+        await InvokeAsync(StateHasChanged);
+    }
+}
+

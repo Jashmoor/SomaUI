@@ -1,0 +1,21 @@
+﻿@namespace SomaUI.Tracing
+
+<CascadingValue Value="Status" Name="TraceLineStatus">
+    <span class="@Cn.Merge("flex min-w-0 items-center gap-2 py-1 text-muted-foreground", StatusClass, Class)"
+          data-status="@Status.ToString().ToLowerInvariant()" @attributes="Attrs">
+        @ChildContent
+    </span>
+</CascadingValue>
+
+@code {
+    [Parameter] public TraceStatus Status { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? Attrs { get; set; }
+
+    private string? StatusClass => Status switch {
+        TraceStatus.Error => "text-destructive",
+        TraceStatus.Pending => "opacity-60",
+        _ => null
+    };
+}

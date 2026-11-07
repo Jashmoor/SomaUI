@@ -1,0 +1,92 @@
+﻿@namespace SomaUI
+@using System.Globalization
+
+@if (context != null && context.ActiveIndex >= 0 && context.ActiveIndex < context.Data.Count)
+{
+    var item = context.Data[context.ActiveIndex];
+
+    @if (context.IsPieStyle)
+    {
+        var nameKey = context.NameDataKey ?? "name";
+        var valueKey = context.ValueDataKey ?? "value";
+        var name = DataAccessor.GetString(item, nameKey);
+        var value = DataAccessor.GetDouble(item, valueKey);
+
+        var displayName = context.Config.TryGetValue(name, out var cfgEntry)
+            ? cfgEntry.Label ?? name
+            : name;
+        var color = cfgEntry?.Color ?? DataAccessor.GetString(item, "fill") ?? $"var(--color-{name})";
+
+        <div class="space-y-1" style="--ds-font-size: var(--text-xs);">
+            <div style="display: flex; align-items: center; gap: var(--spacing-xs);">
+                @if (!HideIndicator)
+                {
+                    <div style="background: @color ; block-size: var(--ds-font-size); inline-size: var(--ds-font-size);"></div>
+                }
+                <small>@displayName</small>
+                <span class="font-medium ml-auto tabular-nums">@value.ToString("N0", CultureInfo.InvariantCulture)</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        var xKey = context.XDataKey ?? "name";
+        var label = !string.IsNullOrEmpty(LabelKey)
+            ? DataAccessor.GetString(item, LabelKey)
+            : DataAccessor.GetString(item, xKey);
+
+        <div class="space-y-1">
+            @if (!HideLabel)
+            {
+                <p class="" style="--ds-font-size: var(--text-sm); margin-block-end: var(--spacing-xxs);">@label</p>
+            }
+
+            @foreach (var (key, entry) in context.Config)
+            {
+                var value = DataAccessor.GetDouble(item, key);
+                var name = entry.Label ?? key;
+                var color = entry.Color ?? $"var(--color-{key})";
+
+                <div style="display: flex; align-items: center; gap: var(--spacing-xxs); --ds-font-size: var(--text-xs);">
+                    @if (!HideIndicator)
+                    {
+                        @switch (Indicator)
+                        {
+                            case TooltipIndicator.Dot:
+                                <div style="background: @color; block-size: var(--ds-font-size); inline-size: var(--ds-font-size);"></div>
+                                break;
+                            case TooltipIndicator.Line:
+                                <div style="background: @color; block-size: var(--ds-font-size); inline-size: var(--ds-font-size);"></div>
+                                break;
+                            case TooltipIndicator.Dashed:
+                                <div style="border-color: @color; block-size: var(--ds-font-size); inline-size: var(--ds-font-size);"></div>
+                                break;
+                        }
+                    }
+                    <small>@name</small>
+                    <span class="font-medium ml-auto tabular-nums">@value.ToString("N0", CultureInfo.InvariantCulture)</span>
+                </div>
+            }
+        </div>
+    }
+}
+
+@code {
+    [CascadingParameter(Name = "_context")]
+    private ChartContext? context { get; set; }
+
+    [Parameter]
+    public bool HideLabel { get; set; } = false;
+
+    [Parameter]
+    public bool HideIndicator { get; set; } = false;
+
+    [Parameter]
+    public TooltipIndicator Indicator { get; set; } = TooltipIndicator.Dot;
+
+    [Parameter]
+    public string? LabelKey { get; set; }
+
+    [Parameter]
+    public string? NameKey { get; set; }
+}

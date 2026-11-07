@@ -1,0 +1,64 @@
+﻿@namespace SomaUI
+@using System.Globalization
+@inherits BaseComponent
+
+<figure @ref="@Element" chart-container @attributes="@Attributes" id="@UniqueID" @onmouseleave="() => Context?.ClearActiveIndex()">
+    <CascadingValue Value="this" IsFixed="true">
+        <CascadingValue Value="@Context" Name="_context">
+            <svg chart viewBox="@ViewBox">
+                @if (Scaled)
+                {
+                    <Defer>
+                        @ChildContent
+                    </Defer>
+                }
+                else
+                {
+                    <ChartLoading Data="[]" />
+                }
+            </svg>
+            @if (Scaled == false)
+            {
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                    <Shimmer>
+                        Loading
+                    </Shimmer>
+                </div>
+            }
+
+            @if (Context.TooltipEnabled && Context.ActiveIndex >= 0 && Context.ActiveIndex < Context.Data.Count)
+            {
+                <div chart-tooltip style="@TooltipPositionStyle">
+                    @if (Context.TooltipCustomContent != null)
+                    {
+                        @Context.TooltipCustomContent
+                    }
+                    else
+                    {
+                        <ChartTooltipContent HideLabel="Context.TooltipHideLabel"
+                                             HideIndicator="Context.TooltipHideIndicator"
+                                             Indicator="Context.TooltipIndicator"
+                                             LabelKey="@Context.TooltipLabelKey"
+                                             NameKey="@Context.TooltipNameKey" />
+                    }
+                </div>
+            }
+            <ChartLegend Title="@Title" />
+
+        </CascadingValue>
+    </CascadingValue>
+</figure>
+
+@code {
+    [Parameter] public string? Title { get; set; } = "Chart";
+
+
+    private string TooltipPositionStyle {
+        get {
+            var left = Context.TooltipLeftPct.ToString("F1", CultureInfo.InvariantCulture);
+            var top = Context.TooltipTopPct.ToString("F1", CultureInfo.InvariantCulture);
+            return $"left: {left}%; top: {top}%; transform: translateX(-50%) translateY(-100%) translateY(-8px);";
+            // return $"left: {mouseX}%; top: {mouseY}%; position: absolute;";
+        }
+    }
+}

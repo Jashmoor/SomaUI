@@ -1,0 +1,17 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<Button Href="@Href" Disabled="@Disabled" Size="ButtonSize.Icon" pagination-link OnClick="HandleClick">
+    @ChildContent
+</Button>
+
+@code {
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string? Href { get; set; }
+
+    public async Task HandleClick() {
+        if (!Disabled)
+            await OnClick.InvokeAsync();
+    }
+}

@@ -1,0 +1,59 @@
+﻿[progress-bar] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    inline-size: 100%;
+    max-inline-size: var(--container-sm);
+    --ds-font-size: var(--text-sm);
+    --ds-line-height: 1;
+    --ds-letter-spacing: var(--tracking-tight);
+    --ds-font-weight: var(--font-weight-light);
+}
+
+[progress-track] {
+    position: relative;
+    block-size: var(--spacing-xxs);
+    display: flex;
+    align-items: center;
+    overflow-x: hidden;
+    background: var(--surface-2);
+    inline-size: 100%;
+    border-radius: var(--spacing);
+}
+
+[progress-indicator] {
+    block-size: 100%;
+    background: var(--muted-foreground);
+    opacity: 0.8;
+    transition: all var(--animation-speed-fast);
+    inset-inline-start: 0;
+
+    &[auto] {
+        animation: progres-bar calc(1s * attr(data-auto type(<number>))) forwards linear;
+        animation-timing-function: linear;
+    }
+
+    &[indeterminate] {
+        animation: progres-bar 1.5s infinite;
+        animation-timing-function: var(--ease-in-out);
+    }
+}
+
+@keyframes progres-bar {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+[progress-label] {
+}
+
+[progress-value] {
+    margin-inline-start: auto;
+    --ds-font-size: var(--text-base);
+    --ds-font-weight: var(--font-weight-light);
+}

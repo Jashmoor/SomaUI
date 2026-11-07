@@ -1,0 +1,210 @@
+﻿@page "/Data"
+@rendermode InteractiveServer
+
+<Container>
+
+    <Button OnClick="FirePreventable">
+        Test
+    </Button>
+    <h1>Data</h1>
+    @* @Selected.Count *@
+    @Counter
+
+    <ScrollArea>
+        @foreach (var item in List)
+        {
+            <li animate fade-in @onclick="async () => await UserDelete(item)">@item.Name</li>
+        }
+    </ScrollArea>
+
+    <DataTable TItem="@ExampleData" Items="Data" @bind-SelectedItems="@Selected">
+        @*         <GroupHeaderTemplate Context="group">
+            <Item>
+                <ItemContent>
+                    <ItemTitle>@group.Item1.Key</ItemTitle>
+                    <ItemDescription>@group.Item1.Count()</ItemDescription>
+                </ItemContent>
+            </Item>
+        </GroupHeaderTemplate> *@
+        <ChildContent>
+            <CategoryColumn T="@ExampleData" Title="Adult" ValueExpression="x => x.Age > 25" />
+            <CategoryColumn T="@ExampleData" Title="Highest Rated" ValueExpression="x => x.Rating >= 4" />
+            <PropertyColumn T="@ExampleData" Title="Name" ValueExpression="x => x.Name" Sortable Searchable>
+                <CellTemplate Context="element">
+                    <Item>
+                        <ItemMedia>
+                            <Avatar Size="AvatarSize.Small" Source="https://plus.unsplash.com/premium_photo-1789080178308-24a2baf5a9d6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D">
+                                <Fallback>
+                                    <span>BA</span>
+                                </Fallback>
+                            </Avatar>
+                        </ItemMedia>
+                        <ItemContent>
+                            <ItemTitle>
+                                @element.Name
+                            </ItemTitle>
+                            <ItemDescription>
+                                @element.Age
+                            </ItemDescription>
+                        </ItemContent>
+                        <ItemActions>
+                            <Popover>
+                                <PopoverTrigger>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button>Summary</Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <span>View Summary</span>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>@element.Name</CardTitle>
+                                            <CardDescription>@element.Nickname</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <Item>
+                                                <ItemContent>
+                                                    <ItemTitle>@element.Age</ItemTitle>
+                                                    <ItemDescription>@element.Rating</ItemDescription>
+                                                </ItemContent>
+                                                <ItemActions>
+                                                    <Button>Delete</Button>
+                                                </ItemActions>
+                                            </Item>
+                                        </CardContent>
+                                    </Card>
+                                </PopoverContent>
+                            </Popover>
+                        </ItemActions>
+                    </Item>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn T="@ExampleData" Title="Age" ValueExpression="x => x.Age" Sortable />
+            <PropertyColumn T="@ExampleData" Title="Rating" ValueExpression="x => x.Rating" />
+            <PropertyColumn T="@ExampleData" Title="Nickname" ValueExpression="x => x.Nickname" Searchable />
+        </ChildContent>
+    </DataTable>
+
+
+    <h3>Simple Table</h3>
+    <Table>
+        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableHeader>
+            <TableRow>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Method</TableHead>
+                <TableHead class="text-right">Amount</TableHead>
+            </TableRow>
+        </TableHeader>
+        <TableBody>
+            @foreach (var i in Enumerable.Range(0, 5))
+            {
+                <TableRow @key="i">
+                    <TableCell class="font-medium">INV001</TableCell>
+                    <TableCell>Paid</TableCell>
+                    <TableCell>Credit Card</TableCell>
+                    <TableCell class="text-right">$250.00</TableCell>
+                </TableRow>
+            }
+        </TableBody>
+    </Table>
+
+</Container>
+
+@code {
+    [Inject] public IToastService ToastService { get; set; } = default!;
+
+    private async Task UserDelete(ExampleData data) {
+        Task.Run(async () => await ToastService.UserPreventable(new UserPreventableOptions {
+            Loading = $"Deleting {data.Name}",
+            Description = $"{data.Name} will be removed from your team",
+            OnInitial = async (token) => {
+                List.Remove(data);
+                await InvokeAsync(StateHasChanged);
+            },
+            OnFailure = async (token) => {
+                List.Add(data);
+                await InvokeAsync(StateHasChanged);
+            }
+        }));
+        await Task.CompletedTask;
+    }
+
+    private int Counter = 0;
+    private async Task Started(CancellationToken token) {
+        Counter = 0;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Task Completed(CancellationToken token) {
+        Counter = Random.Shared.Next(200, 2000);
+        InvokeAsync(StateHasChanged);
+        return Task.CompletedTask;
+    }
+
+    private Task Error(CancellationToken token) {
+        Counter = -200;
+        InvokeAsync(StateHasChanged);
+        return Task.CompletedTask;
+    }
+
+    private async Task FirePreventable() {
+        var a = await ToastService.UserPreventable(new UserPreventableOptions {
+            Loading = "Sorting your stuff out",
+            Description = "We are doing stuff in the background",
+            OnInitial = Started,
+            OnSuccess = Completed,
+            OnFailure = Error
+        });
+    }
+
+
+    private class ExampleData {
+        public string? Name { get; set; }
+        public int Age { get; set; }
+        public string? Nickname { get; set; }
+        public int Rating { get; set; }
+    }
+
+    private HashSet<ExampleData> Selected = new();
+
+    private List<ExampleData> List = new List<ExampleData>()
+    {
+        new(){ Name = "Amy", Age = 27, Rating = 3, Nickname = "Amy woo"},
+        new(){ Name = "Adam", Age = 31, Rating = 1, Nickname = "adamadam"},
+        new(){ Name = "Natalie", Age = 24, Rating = 3, Nickname = "nat"},
+        new(){ Name = "Sydney", Age = 21, Rating = 5, Nickname = "sid"},
+        new(){ Name = "Todd", Age = 45, Rating = 1, Nickname = "tudd"}
+    };
+
+    private IQueryable<ExampleData> Data = new ExampleData[]
+    {
+        new(){ Name = "Amy", Age = 27, Rating = 3, Nickname = "Amy woo"},
+        new(){ Name = "Tony", Age = 18, Rating = 4, Nickname = "Tony doodle"},
+        new(){ Name = "Adam", Age = 31, Rating = 1, Nickname = "adamadam"},
+        new(){ Name = "Natalie", Age = 24, Rating = 3, Nickname = "nat"},
+        new(){ Name = "Sydney", Age = 21, Rating = 5, Nickname = "sid"},
+        new(){ Name = "Todd", Age = 45, Rating = 1, Nickname = "tudd"},
+                new(){ Name = "Adam", Age = 31, Rating = 1, Nickname = "damadad"},
+        new(){ Name = "Natalie", Age = 24, Rating = 3, Nickname = "whistle"},
+        new(){ Name = "Sydney", Age = 22, Rating = 5, Nickname = "asidsid"},
+        new(){ Name = "Todd", Age = 45, Rating = 1, Nickname = "ddot"},
+                new(){ Name = "Adam", Age = 31, Rating = 1, Nickname = "amana"},
+        new(){ Name = "Natalie", Age = 24, Rating = 3, Nickname = "tmala"},
+        new(){ Name = "Sydney", Age = 23, Rating = 5, Nickname = "yendyns"},
+        new(){ Name = "Todd", Age = 45, Rating = 1, Nickname = "dd"},
+                new(){ Name = "Adam", Age = 31, Rating = 1, Nickname = null},
+        new(){ Name = "Natalie", Age = 24, Rating = 3, Nickname = string.Empty },
+        new(){ Name = "Sydney", Age = 24, Rating = 5, Nickname = "adam"},
+        new(){ Name = "Todd", Age = 45, Rating = 1, Nickname = "ddttdd"},
+                new(){ Name = "Adam", Age = 31, Rating = 1, Nickname = "dd dd dd"},
+        new(){ Name = "Natalie", Age = 24, Rating = 3, Nickname = "tamalis"},
+        new(){ Name = "Sydney", Age = 25, Rating = 5, Nickname = "banana"},
+        new(){ Name = "Todd", Age = 45, Rating = 1, Nickname = null}
+    }.AsQueryable();
+}

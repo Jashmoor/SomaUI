@@ -1,0 +1,43 @@
+﻿@namespace SomaUI
+
+@code {
+    [CascadingParameter(Name = "_context")]
+    private ChartContext? Context { get; set; }
+
+    [Parameter]
+    public RenderFragment? Content { get; set; }
+
+    [Parameter]
+    public bool HideLabel { get; set; } = false;
+
+    [Parameter]
+    public bool HideIndicator { get; set; } = false;
+
+    [Parameter]
+    public TooltipIndicator Indicator { get; set; } = TooltipIndicator.Dot;
+
+    [Parameter]
+    public string? LabelKey { get; set; }
+
+    [Parameter]
+    public string? NameKey { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    protected override void OnParametersSet() {
+        if (Context == null)
+            return;
+        Context.TooltipEnabled = true;
+        Context.TooltipHideLabel = HideLabel;
+        Context.TooltipHideIndicator = HideIndicator;
+        Context.TooltipIndicator = Indicator;
+        Context.TooltipLabelKey = LabelKey;
+        Context.TooltipNameKey = NameKey;
+        Context.TooltipCustomContent = Content;
+        Context.TooltipClass = Class;
+    }
+}

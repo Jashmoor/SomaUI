@@ -1,0 +1,38 @@
+﻿@namespace SomaUI
+@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Components.Forms
+@inherits BaseWithChildComponent
+@typeparam T
+
+<p field-description id="@(FieldContext?.DescriptionId)">
+    @if (For is not null)
+    {
+        @if (Error is false)
+        {
+            <div animate fade-in>
+                @ChildContent
+            </div>
+        }
+        else
+        {
+            <ValidationMessage For="@For" animate fade-in x-slow />
+        }
+    }
+    else
+    {
+        <div animate fade-in>
+            @ChildContent
+        </div>
+    }
+</p>
+
+@code {
+    [CascadingParameter] public Expression<Func<T>>? For { get; set; }
+    [CascadingParameter] public EditContext? ParentContext { get; set; }
+    [CascadingParameter] internal FieldContext? FieldContext { get; set; }
+
+    private bool Error => For is not null ?
+        (ParentContext?.GetValidationMessages(FieldIdentifier.Create(For)).Any() ?? false)
+        : false;
+
+}

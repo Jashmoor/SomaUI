@@ -1,0 +1,43 @@
+﻿[badge-container] {
+    display: inline-flex;
+    position: relative;
+    inline-size: fit-content;
+    --badge-measure: calc(var(--spacing-xs) * -1);
+
+    &:has(> [avatar]) {
+        --badge-measure: calc(var(--spacing-xs) * -0.5);
+    }
+}
+
+[notification-badge] {
+    --ds-font-size: calc(var(--spacing-sm) - 2px);
+    --ds-font-weight: var(--font-weight-light);
+    inset: var(--badge-measure) var(--badge-measure) auto auto;
+    background: var(--accent);
+    color: var(--accent-foreground);
+
+    &[data-position='topleft'] {
+        inset: var(--badge-measure) auto auto var(--badge-measure);
+    }
+
+    &[data-position='bottomright'] {
+        inset: auto var(--badge-measure) var(--badge-measure) auto;
+    }
+
+    &[data-position='bottomleft'] {
+        inset: auto auto var(--badge-measure) var(--badge-measure);
+    }
+
+    position: absolute;
+    text-align: center;
+    inline-size: var(--spacing);
+    block-size: var(--spacing);
+    border-radius: 9999px;
+    font-size: var(--ds-font-size);
+    line-height: var(--spacing);
+    border-width: 1px;
+    box-shadow: 0 0 2px 2px var(--background);
+    pointer-events: none;
+    isolation: isolate;
+    z-index: 10;
+}

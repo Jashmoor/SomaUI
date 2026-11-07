@@ -1,0 +1,70 @@
+﻿@namespace SomaUI
+@using Microsoft.JSInterop
+@inherits BaseWithChildComponent
+@implements IDisposable
+
+<div @ref="Element" dropdown id="@_context.Id">
+    <CascadingValue Value="@_context" IsFixed="false">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [Inject] private IPopupService Service { get; set; } = default!;
+    [Parameter] public bool? Open { get; set; }
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+    [Parameter] public bool Sync { get; set; } = false;
+
+    internal DropdownContext _context { get; set; } = new();
+    internal ControllableState<bool> State = null!;
+
+    private bool last_state;
+    private DotNetObjectReference<Dropdown>? _reference;
+
+    protected override void OnInitialized() {
+        _reference ??= DotNetObjectReference.Create(this);
+        State = new(false) {
+            ControlledValue = Open ?? false,
+            OnValueChanged = OpenChanged,
+            Controlled = Open.HasValue
+        };
+
+        _context.State.Open = last_state = State.Value;
+        _context.OnStateChange += HandleContextStateChanged;
+    }
+
+    protected override void OnParametersSet() {
+        if (State.Controlled && Open.HasValue)
+            last_state = State.Controlled = _context.State.Open = Open.Value;
+    }
+
+    private void HandleContextStateChanged() {
+        var new_state = _context.State.Open;
+        if (last_state != new_state)
+        {
+            last_state = new_state;
+            _ = State.SetValueAsync(new_state);
+
+            if (new_state)
+                InvokeAsync(() => Service.CalculatePosition<Dropdown>(Element, _context.ContentId, _reference!, Sync));
+            else
+                InvokeAsync(() => Service.ClosePopup(_context.Id, _context.ContentId));
+
+            if (OpenChanged.HasDelegate)
+                _ = OpenChanged.InvokeAsync(new_state);
+        }
+
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async ValueTask JavascriptClose() {
+        _context.Close();
+    }
+
+    public override void Dispose() {
+        _reference?.Dispose();
+        _context.OnStateChange -= HandleContextStateChanged;
+        base.Dispose();
+    }
+}

@@ -1,0 +1,12 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div @ref="Element" scroll-area @attributes="Attributes">
+    <div internal-scroll style="@(Shadows ? "" : "--mask: none;")">
+    @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool Shadows { get; set; } = true;
+}

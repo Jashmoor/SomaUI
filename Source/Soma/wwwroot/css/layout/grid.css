@@ -1,0 +1,143 @@
+﻿[feature-cards] {
+    container-name: feature-grid;
+    container-type: inline-size;
+}
+
+[grid-layout], [feature-cards-grid] {
+    display: grid;
+    grid-template-columns: repeat(12,1fr);
+    grid-gap: var(--spacing);
+    grid-auto-flow: dense;
+
+    @media screen and (max-width: 992px) {
+        grid-template-columns: repeat(8, 1fr);
+    }
+
+    @media screen and (max-width: 600px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+[feature-cards-grid] {
+    @media screen and (max-width: 600px) {
+        overflow-x: scroll;
+    }
+
+    @container feature-grid (max-width: 60ch) {
+        display: flex;
+        inline-size: 100%;
+        overflow-x: scroll;
+        scrollbar-width: thin;
+        scroll-snap-type: x proximity;
+
+        & > [grid-item] {
+            flex: 0 0 90%;
+            inline-size: 100%;
+            scroll-snap-align: start;
+        }
+    }
+}
+
+
+[grid-item] {
+
+    &.s1 {
+        grid-area: auto / span 1;
+    }
+
+    &.s2 {
+        grid-area: auto / span 2;
+    }
+
+    &.s3 {
+        grid-area: auto / span 3;
+    }
+
+    &.s4 {
+        grid-area: auto / span 4;
+    }
+
+    @media screen and (min-width: 600px) {
+        &.m1 {
+            grid-area: auto / span 1;
+        }
+
+        &.m2 {
+            grid-area: auto / span 2;
+        }
+
+        &.m3 {
+            grid-area: auto / span 3;
+        }
+
+        &.m4 {
+            grid-area: auto / span 4;
+        }
+
+        &.m5 {
+            grid-area: auto / span 5;
+        }
+
+        &.m6 {
+            grid-area: auto / span 6;
+        }
+
+        &.m7 {
+            grid-area: auto / span 7;
+        }
+
+        &.m8 {
+            grid-area: auto / span 8;
+        }
+    }
+
+    @media screen and (min-width: 992px) {
+        &.l1 {
+            grid-area: auto / span 1;
+        }
+
+        &.l2 {
+            grid-area: auto / span 2;
+        }
+
+        &.l3 {
+            grid-area: auto / span 3;
+        }
+
+        &.l4 {
+            grid-area: auto / span 4;
+        }
+
+        &.l5 {
+            grid-area: auto / span 5;
+        }
+
+        &.l6 {
+            grid-area: auto / span 6;
+        }
+
+        &.l7 {
+            grid-area: auto / span 7;
+        }
+
+        &.l8 {
+            grid-area: auto / span 8;
+        }
+
+        &.l9 {
+            grid-area: auto / span 9;
+        }
+
+        &.l10 {
+            grid-area: auto / span 10;
+        }
+
+        &.l11 {
+            grid-area: auto / span 11;
+        }
+
+        &.l12 {
+            grid-area: auto / span 12;
+        }
+    }
+}

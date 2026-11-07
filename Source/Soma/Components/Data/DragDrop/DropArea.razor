@@ -1,0 +1,10 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+@typeparam T
+@attribute [CascadingTypeParameter(nameof(T))]
+
+<CascadingValue Value="this" IsFixed="true">
+    <div @ref="Element" drop-area @attributes="Attributes">
+        @ChildContent
+    </div>
+</CascadingValue>

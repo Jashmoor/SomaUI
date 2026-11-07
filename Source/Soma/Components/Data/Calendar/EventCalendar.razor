@@ -1,0 +1,251 @@
+﻿@namespace SomaUI
+@using System.Globalization
+@inherits BaseWithChildComponent
+@typeparam TEvent
+
+<figure>
+    <Container>
+        <Tabs ValueChanged="UpdateView">
+            <TabsList>
+                <TabsTrigger Value="@CalendarView.Chronological.ToString()">Agenda</TabsTrigger>
+                <TabsTrigger Value="@CalendarView.Week.ToString()">Week</TabsTrigger>
+                <TabsTrigger Value="@CalendarView.Month.ToString()">Month</TabsTrigger>
+            </TabsList>
+        </Tabs>
+    </Container>
+    @if (CurrentView == CalendarView.Month)
+    {
+        <div>
+            <div style="display: flex;">
+                @foreach (var day in DayNames)
+                {
+                    <div role="columnheader">
+                        @day
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    @if (CurrentView == CalendarView.Week)
+    {
+
+    }
+
+    @if (CurrentView == CalendarView.Chronological)
+    {
+        <Timeline>
+            @foreach (var item in AgendaDays.SelectMany(x => GetEventsForDay(x.Date)))
+            {
+                <TimelineItem>
+                    <TimelineHeader>
+                        <TimelineTime>@StartFormat(Start(item))</TimelineTime>
+                        <TimelineTitle>@TitleFormat(EventTitle(item))</TimelineTitle>
+                    </TimelineHeader>
+                    <TimelineContent>
+                        @if (EventTemplate is not null)
+                        {
+                            @EventTemplate(item)
+                        }
+                    </TimelineContent>
+                </TimelineItem>
+            }
+        </Timeline>
+    }
+</figure>
+
+@code {
+    [Parameter] public IEnumerable<TEvent>? Items { get; set; }
+    [Parameter, EditorRequired]
+    public Func<TEvent, DateTime> Start { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public Func<TEvent, DateTime?> End { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public Func<TEvent, string> EventTitle { get; set; } = default!;
+    [Parameter] public Func<TEvent, string>? EventClass { get; set; } = default!;
+
+    [Parameter] public Func<DateTime, string> StartFormat { get; set; } = (date) => date.ToString();
+    [Parameter] public Func<string, string> TitleFormat { get; set; } = (title) => title.ToString();
+
+    [Parameter] public RenderFragment<TEvent> EventTemplate { get; set; } = default!;
+    [Parameter] public DateTime Current { get; set; } = DateTime.Today;
+    [Parameter] public int EventsPerDay { get; set; } = 3;
+    [Parameter] public CalendarView View { get; set; } = CalendarView.Month;
+    [Parameter] public DayOfWeek? FirstDayOfWeek { get; set; }
+
+    [Parameter] public EventCallback<TEvent> OnEventSelect { get; set; }
+    [Parameter] public EventCallback<DateTime> OnDateSelect { get; set; }
+
+    private DayOfWeek EffectiveFirstDay => FirstDayOfWeek ?? CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+    private Dictionary<DateTime, List<TEvent>> EventsByDay = new();
+    private IEnumerable<DateTime> AgendaDays => EventsByDay.Keys.OrderBy(d => d);
+
+    private CalendarView CurrentView;
+    protected override async Task OnParametersSetAsync() {
+        CurrentView = View;
+        await Refresh();
+    }
+
+    private async Task UpdateView(string view) {
+        CurrentView = (CalendarView)Enum.Parse(typeof(CalendarView), view);
+    }
+
+    private async Task Refresh() {
+        BuildCalendar();
+        var range = GetVisibleRange();
+    }
+
+
+    private void BuildCalendar() {
+        EventsByDay = new();
+        if (Items is null || Start is null)
+            return;
+        var range = GetVisibleRange();
+        foreach (var item in Items)
+        {
+            var start = Start(item).Date;
+            var end = (End?.Invoke(item) ?? Start(item)).Date;
+            if (end < start)
+                end = start;
+            var from = start < range.Start ? range.Start : start;
+            var to = end > range.End ? range.End : end;
+            for (var day = from; day <= to; day = day.AddDays(1))
+            {
+                if (!EventsByDay.TryGetValue(day, out var list))
+                {
+                    list = new();
+                    EventsByDay[day] = list;
+                }
+                list.Add(item);
+            }
+        }
+        foreach (var list in EventsByDay.Values)
+        {
+            list.Sort(CompareEvents);
+        }
+    }
+
+    private WeekRowLayout<TEvent> BuildWeekLayout(DateTime[] week, int maxLanes) {
+        var layout = new WeekRowLayout<TEvent>();
+        if (Items is null || Start is null || maxLanes <= 0)
+            return layout;
+
+        var weekStart = week[0];
+        var weekEnd = week[6];
+
+        var spanning = new List<(TEvent Item, DateTime Start, DateTime End)>();
+        foreach (var item in Items)
+        {
+            var start = Start(item).Date;
+            var end = (End?.Invoke(item) ?? Start(item)).Date;
+            if (end < start)
+            {
+                end = start;
+            }
+
+            if (end == start || end < weekStart || start > weekEnd)
+                continue;
+
+            spanning.Add((item, start, end));
+        }
+
+        spanning.Sort(CompareSpanning);
+
+        var occupied = new List<bool[]>();
+
+        foreach (var (item, start, end) in spanning)
+        {
+            var from = start < weekStart ? weekStart : start;
+            var to = end > weekEnd ? weekEnd : end;
+            var startColumn = (from - weekStart).Days;
+            var span = (to - from).Days + 1;
+            var lane = DayBandLayout.Claim(occupied, 7, startColumn, span);
+
+            if (lane >= maxLanes)
+            {
+                for (var column = startColumn; column < startColumn + span; column++)
+                    layout.HiddenPerColumn[column]++;
+                continue;
+            }
+
+            layout.Bars.Add(new EventBar<TEvent>(item, startColumn, span, lane, start < from, end > to));
+            for (var column = startColumn; column < startColumn + span; column++)
+            {
+                layout.BarsPerColumn[column]++;
+            }
+
+            layout.VisibleLaneCount = Math.Max(layout.VisibleLaneCount, lane + 1);
+        }
+
+        return layout;
+    }
+
+    private int CompareSpanning(
+    (TEvent Item, DateTime Start, DateTime End) a,
+    (TEvent Item, DateTime Start, DateTime End) b) {
+        var lengthCompare = (b.End - b.Start).CompareTo(a.End - a.Start);
+        if (lengthCompare != 0)
+            return lengthCompare;
+
+        var startCompare = a.Start.CompareTo(b.Start);
+        return startCompare != 0 ? startCompare : CompareEvents(a.Item, b.Item);
+    }
+
+    private int CompareEvents(TEvent a, TEvent b) {
+        var all_day_compare = IsAllDay(b).CompareTo(IsAllDay(a));
+        if (all_day_compare != 0)
+            return all_day_compare;
+
+        var start_compare = Start(a).CompareTo(Start(b));
+        if (start_compare != 0)
+            return start_compare;
+
+        return string.Compare(EventTitle(a), EventTitle(b), StringComparison.Ordinal);
+    }
+
+    private bool IsAllDay(TEvent item) {
+        var start = Start(item);
+        if (start.TimeOfDay != TimeSpan.Zero)
+            return false;
+        var end = End?.Invoke(item);
+        if (end is null)
+            return true;
+        return end.Value.TimeOfDay == TimeSpan.Zero;
+    }
+
+    private CalendarEventRange GetVisibleRange() {
+        switch (View)
+        {
+            case CalendarView.Week:
+                var weekstart = Weekstart(Current);
+                return new CalendarEventRange(weekstart, weekstart.AddDays(7));
+            case CalendarView.Chronological:
+                var start = new DateTime(Current.Year, Current.Month, 1);
+                return new CalendarEventRange(start, start.AddMonths(1).AddDays(-1));
+            default:
+                var first_of_month = new DateTime(Current.Year, Current.Month, 1);
+                var grid = Weekstart(first_of_month);
+                return new CalendarEventRange(grid, grid.AddDays(41));
+        }
+    }
+
+    private string[] DayNames => BuildDayNames();
+
+    private string[] BuildDayNames() {
+        var cultureNames = CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames;
+        var start = (int)EffectiveFirstDay;
+        var names = new string[7];
+        for (var i = 0; i < 7; i++)
+        {
+            names[i] = cultureNames[(start + i) % 7];
+        }
+        return names;
+    }
+
+    private DateTime Weekstart(DateTime date) {
+        var diff = ((int)date.DayOfWeek - (int)EffectiveFirstDay + 7) % 7;
+        return date.Date.AddDays(-diff);
+    }
+
+    private IReadOnlyList<TEvent> GetEventsForDay(DateTime day) =>
+        EventsByDay.TryGetValue(day.Date, out var list) ? list : Array.Empty<TEvent>();
+}

@@ -1,0 +1,96 @@
+﻿@namespace SomaUI
+@inherits ChartComponent
+
+<g class="chart-line-series" @key="@($"line-loading")">
+    @{
+        var points = BuildPoints();
+        var pathD = CurveFactory.LinePath(points, CurveType.Natural);
+        var strokeColor = $"var(--border)";
+        var pathLength = EstimatePathLength(points);
+    }
+
+    <path d="@pathD"
+          fill="none"
+          stroke="@strokeColor"
+          stroke-width="@F(3)"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="chart-line-animate"
+          style="@($"--path-length: {F(pathLength)})")" />
+
+
+</g>
+
+
+@code {
+
+    private IReadOnlyList<object> Loading => new List<Dictionary<string, object>>
+    {
+        new() { ["load"] = 300 },
+        new() { ["load"] = 120 },
+        new() { ["load"] = 180 },
+        new() { ["load"] = 90 },
+        new() { ["load"] = 286 },
+        new() { ["load"] = 80 },
+        new() { ["load"] = 180 },
+        new() { ["load"] = 200 },
+    }.Cast<object>().ToList();
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+    }
+
+    protected override void BuildScales() {
+        if (Context == null) return;
+
+        var xKey = "load";
+        var categories = DataAccessor.GetAllStrings(Loading, xKey);
+        Context.XBandScale = new ScaleBand(categories, Context.PlotLeft, Context.PlotRight, 0, 0);
+        Context.XDataKey = xKey;
+
+        double yMin = 0, yMax = 0;
+
+        var values = DataAccessor.GetAllDoubles(Loading, "load");
+        foreach (var v in values)
+        {
+            if (v > yMax) yMax = v;
+            if (v < yMin) yMin = v;
+        }
+
+        var (niceMin, niceMax) = ChartMath.NiceExtent(yMin, yMax);
+        Context.YScale = new ScaleLinear(niceMin, niceMax, Context.PlotBottom, Context.PlotTop);
+    }
+
+
+    private List<(double X, double Y)> BuildPoints() {
+        if (Context?.XBandScale == null || Context.YScale == null)
+            return [];
+
+        var data = Loading;
+        var xKey = "load";
+        var points = new List<(double X, double Y)>();
+
+        for (int i = 0; i < data.Count; i++)
+        {
+            var item = data[i];
+            var cat = DataAccessor.GetString(item, xKey);
+            var value = DataAccessor.GetDouble(item, "load");
+            var x = Context.XBandScale.ScaleCenter(cat);
+            var y = Context.YScale.Scale(value);
+            points.Add((x, y));
+        }
+
+        return points;
+    }
+
+    private static double EstimatePathLength(List<(double X, double Y)> points) {
+        double length = 0;
+        for (int i = 1; i < points.Count; i++)
+        {
+            var dx = points[i].X - points[i - 1].X;
+            var dy = points[i].Y - points[i - 1].Y;
+            length += Math.Sqrt(dx * dx + dy * dy);
+        }
+        return length * 1.2;
+    }
+}

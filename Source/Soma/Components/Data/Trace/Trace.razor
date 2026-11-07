@@ -1,0 +1,115 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<ul data-card>
+    <TraceItem Items="Items" />
+</ul>
+
+@code {
+    [Parameter] public List<TraceModel> Items { get; set; } = [];
+    [Parameter] public EventCallback<TraceModel> ItemClicked { get; set; }
+    [Parameter] public EventCallback<(TraceModel Item, bool Expanded)> OnExpandChanged { get; set; }
+
+    protected override void OnInitialized() {
+        foreach (var item in Items)
+        {
+            Initialise(item);
+        }
+    }
+
+    private void Initialise(TraceModel item) {
+        if (item.DefaultOpen)
+        {
+            item.Expanded = true;
+        }
+        foreach (var child in item.Children)
+        {
+            Initialise(child);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        if (first)
+        {
+            foreach(var item in Items)
+            {
+                await ExecuteAction(item);
+            }
+        }
+    }
+
+    public async Task HandleItemClickAsync(TraceModel item) {
+        await ItemClicked.InvokeAsync(item);
+        if (item.Action == TraceAction.Collapsible)
+        {
+            item.Expanded = !item.Expanded;
+            await OnExpandChanged.InvokeAsync((item, item.Expanded));
+            await InvokeAsync(StateHasChanged);
+        }
+        if (item.Action == TraceAction.Executable)
+            await ExecuteAction(item);
+    }
+
+    public async Task ExecuteAction(TraceModel item) {
+        if (item.Executing)
+            return;
+
+        item.Executing = true;
+        item.Status = TraceStatus.Running;
+        item.ErrorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            await item.AsyncAction!(item);
+            if (item.Status == TraceStatus.Error)
+                throw new Exception($"{item.Title} error");
+            if (item.Status == TraceStatus.Running)
+            {
+                item.Status = TraceStatus.Finished;
+            }
+            foreach (var child in item.Children)
+            {
+                await ExecuteAction(child);
+            }
+        }
+        catch (Exception ex)
+        {
+            item.Status = TraceStatus.Error;
+            item.ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            item.Executing = false;
+            StateHasChanged();
+        }
+    }
+
+    public void UpdateItemStatus(string item_id, TraceStatus status, string? description = null) {
+        var item = FindItem(Items, item_id);
+        if (item != null)
+        {
+            item.Status = status;
+            if (description != null)
+            {
+                item.Description = description;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private TraceModel? FindItem(IEnumerable<TraceModel> source, string id) {
+        foreach (var element in source)
+        {
+            if (element.Id == id)
+                return element;
+            var found = FindItem(element.Children, id);
+            if (found != null)
+                return found;
+        }
+        return null;
+    }
+
+}
+

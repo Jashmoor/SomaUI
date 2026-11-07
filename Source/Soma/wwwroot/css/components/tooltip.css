@@ -1,0 +1,43 @@
+﻿[tooltip] {
+    position: relative;
+    anchor-name: --tooltip;
+    anchor-scope: --tooltip;
+    inline-size: fit-content;
+    z-index: 30;
+}
+
+[tooltip-content] {
+    opacity: 1;
+    background: var(--color-neutral-200);
+    color: var(--color-neutral-900);
+    padding-block: var(--spacing-xxs);
+    padding-inline: var(--spacing-xs);
+    border-radius: var(--spacing-xxs);
+    pointer-events: none;
+    transform: translateY(0);
+    transition-property: opacity, transform;
+    transition-duration: 0.1s;
+    transition-timing-function: var(--ease-in-out);
+    --ds-font-size: var(--text-xs);
+    --ds-line-height: 1.2;
+    --ds-letter-spacing: var(--tracking-loose);
+    --ds-font-weight: var(--font-weight-semibold);
+    color: var(--color-neutral-700);
+
+    @starting-style {
+        transform: translateY(10px);
+    }
+
+    &[data-state='open']{
+        opacity: 1;
+    }
+
+    &[data-state='closed'] {
+        opacity: 0;
+        transition-duration: var(--animation-speed-normal);
+    }
+}
+
+[tooltip-trigger] {
+}
+

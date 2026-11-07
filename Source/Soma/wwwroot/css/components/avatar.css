@@ -1,0 +1,71 @@
+﻿[avatar] {
+    --ds-font-size: var(--text-xs);
+    --ds-font-weight: var(--font-weight-light);
+    border-radius: 9999px;
+    background: transparent;
+    overflow: hidden;
+    display: grid;
+    grid-template-areas: "grid";
+    place-items: center;
+    aspect-ratio: 1;
+    max-inline-size: calc(2rem * 1.25);
+
+    & > * {
+        grid-area: grid;
+    }
+
+    &[size='small'] {
+        max-inline-size: 2rem;
+    }
+
+    &[size='large'] {
+        max-inline-size: 3rem;
+    }
+
+    &[size='extralarge'] {
+        max-inline-size: 4rem;
+    }
+}
+
+[avatar-loading] {
+    display: none;
+    order: 3;
+    width: 100%;
+    height: 100%;
+    background: var(--color-neutral-950);
+
+    & [spinner] {
+        display: block;
+        width: inherit;
+    }
+}
+
+[avatar-image] {
+    order: 2;
+    object-fit: cover;
+    block-size: 100%;
+    inline-size: auto;
+
+    &[data-state='error'] {
+        display: none;
+    }
+}
+
+    [avatar-image][data-state='loading'] + [avatar-loading] {
+        display: block;
+    }
+
+[avatar-fallback] {
+    order: 1;
+    border-radius: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    block-size: 100%;
+    inline-size: 100%;
+
+    & svg {
+        block-size: 100%;
+        inline-size: 100%;
+    }
+}

@@ -1,0 +1,230 @@
+﻿@page "/Motion"
+@rendermode InteractiveServer
+
+<Container>
+    <Animate>
+        <Animation>
+            <FadeIn />
+        </Animation>
+        <Content>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Fade in</CardTitle>
+                    <CardAction>
+                        <button @onclick="ReRun">Test</button>
+                    </CardAction>
+                </CardHeader>
+                <CardContent style="min-block-size: 12rem;">
+                    @if (Animate)
+                    {
+                        <Item animate fade-in fast>
+                            <ItemTitle>Fade in (fast)</ItemTitle>
+                        </Item>
+                        <Item animate fade-in>
+                            <ItemTitle>Fade in</ItemTitle>
+                        </Item>
+                        <Item animate fade-in slow>
+                            <ItemTitle>Fade in (slow)</ItemTitle>
+                        </Item>
+                        <Item animate fade-in x-slow>
+                            <ItemTitle>Fade in (x-slow)</ItemTitle>
+                        </Item>
+                    }
+                </CardContent>
+            </Card>
+        </Content>
+    </Animate>
+
+    <Card>
+        <CardHeader>
+            <CardTitle>Fade in</CardTitle>
+            <CardAction>
+                <button @onclick="ReRun">Test</button>
+            </CardAction>
+        </CardHeader>
+        <CardContent style="min-block-size: 12rem;">
+            @if (Animate)
+            {
+                <Item animate fade-in fast>
+                    <ItemTitle>Fade in (fast)</ItemTitle>
+                </Item>
+                <Item animate fade-in>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in slow>
+                    <ItemTitle>Fade in (slow)</ItemTitle>
+                </Item>
+                <Item animate fade-in x-slow>
+                    <ItemTitle>Fade in (x-slow)</ItemTitle>
+                </Item>
+            }
+        </CardContent>
+    </Card>
+
+    <Card>
+        <CardHeader>
+            <CardTitle>Fade in left</CardTitle>
+            <CardAction>
+                <button @onclick="ReRun">Test</button>
+            </CardAction>
+        </CardHeader>
+        <CardContent style="min-block-size: 12rem;">
+            @if (Animate)
+            {
+                <Item animate fade-in-left fast>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in-left>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in-left slow>
+                    <ItemTitle>Fade in (slow)</ItemTitle>
+                </Item>
+                <Item animate fade-in-left x-slow>
+                    <ItemTitle>Fade in (x-slow)</ItemTitle>
+                </Item>
+            }
+        </CardContent>
+    </Card>
+
+    <Card>
+        <CardHeader>
+            <CardTitle>Fade in up</CardTitle>
+            <CardAction>
+                <button @onclick="ReRun">Test</button>
+            </CardAction>
+        </CardHeader>
+        <CardContent style="min-block-size: 12rem;">
+            @if (Animate)
+            {
+                <Item animate fade-in-up fast>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in-up>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in-up slow>
+                    <ItemTitle>Fade in (slow)</ItemTitle>
+                </Item>
+                <Item animate fade-in-up x-slow>
+                    <ItemTitle>Fade in (x-slow)</ItemTitle>
+                </Item>
+            }
+        </CardContent>
+    </Card>
+
+    <Card>
+        <CardHeader>
+            <CardTitle>Fade in down</CardTitle>
+            <CardAction>
+                <button @onclick="ReRun">Test</button>
+            </CardAction>
+        </CardHeader>
+        <CardContent style="min-block-size: 12rem;">
+            @if (Animate)
+            {
+                <Item animate fade-in-down fast>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in-down>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in-down slow>
+                    <ItemTitle>Fade in (slow)</ItemTitle>
+                </Item>
+                <Item animate fade-in-down x-slow>
+                    <ItemTitle>Fade in (x-slow)</ItemTitle>
+                </Item>
+            }
+        </CardContent>
+    </Card>
+
+    <Card>
+        <CardHeader>
+            <CardTitle>Fade in right</CardTitle>
+            <CardAction>
+                <button @onclick="ReRun">Test</button>
+            </CardAction>
+        </CardHeader>
+        <CardContent style="min-block-size: 12rem;">
+            @if (Animate)
+            {
+                <Item animate fade-in-right fast>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in-right>
+                    <ItemTitle>Fade in</ItemTitle>
+                </Item>
+                <Item animate fade-in-right slow>
+                    <ItemTitle>Fade in (slow)</ItemTitle>
+                </Item>
+                <Item animate fade-in-right x-slow>
+                    <ItemTitle>Fade in (x-slow)</ItemTitle>
+                </Item>
+            }
+        </CardContent>
+    </Card>
+
+    <Card>
+        <CardHeader>
+            <CardTitle>Child Animations</CardTitle>
+            <CardDescription>Child animations are fixed in length, but will spread their duration over the amount of items</CardDescription>
+            <CardAction>
+                <button @onclick="ReRun">Test</button>
+            </CardAction>
+        </CardHeader>
+        <CardContent>
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); min-block-size: 20rem;">
+                @if (Animate)
+                {
+                    <ul>
+                        <li animate animate-child fade-in>1</li>
+                        <li animate animate-child fade-in>2</li>
+                    </ul>
+
+                    <ul>
+                        @foreach (var item in TestList())
+                        {
+                            <li @key="item" animate animate-child fade-in-right>@item</li>
+                        }
+                    </ul>
+                    <ul>
+                        @foreach (var item in TestList().Take(6))
+                        {
+                            <li @key="item" animate animate-child fade-in-left>@item</li>
+                        }
+                    </ul>
+                    <ul>
+                        @foreach (var item in TestList().Take(10))
+                        {
+                            <li @key="item" animate animate-child fade-in-up>@item</li>
+                        }
+                    </ul>
+                    <ul>
+                        @foreach (var item in TestList())
+                        {
+                            <li @key="item" animate animate-child fade-in-down>@item</li>
+                        }
+                    </ul>
+                }
+            </div>
+        </CardContent>
+    </Card>
+
+
+</Container>
+
+@code {
+    private bool Animate { get; set; } = true;
+    public async Task ReRun() {
+        Animate = false;
+        StateHasChanged();
+        await Task.Delay(100);
+        await InvokeAsync(async () => {
+            Animate = true;
+            StateHasChanged();
+        });
+    }
+
+    private IEnumerable<int> TestList() => Enumerable.Range(0, 15);
+}

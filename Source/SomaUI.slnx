@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Soma/SomaUI.csproj" />
+  <Project Path="Demo/TestBench.csproj" />
+</Solution>

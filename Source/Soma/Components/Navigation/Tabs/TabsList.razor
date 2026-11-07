@@ -1,0 +1,11 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div tabs-list data-anchor="@Parent?.AnchorScope" bordered="@Border">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter] public Tabs? Parent { get; set; } = default!;
+    [Parameter] public bool Border { get; set; }
+}

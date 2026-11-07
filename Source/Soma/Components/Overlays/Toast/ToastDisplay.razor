@@ -1,0 +1,83 @@
+﻿@namespace SomaUI
+@implements IDisposable
+
+<section toaster
+         @onmouseenter="async () => await SetExpanded(true)"
+         @onmouseleave="async () => await SetExpanded(false)"
+         @onmouseover="async () => await SetExpanded(true)">
+    @{
+        var toast_offset = 0d;
+
+        @for (var i = 0; i < Toasts.Count; i++)
+        {
+            var toast = Toasts[i];
+            var toast_height = 3d;
+            var zIndex = Toasts.Count - 1 - i;
+            <ToastNotification @key="toast.Id"
+                               Toast="@toast"
+                               Total="@Toasts.Count"
+                               Expanded="@Expanded"
+                               Index="@zIndex"
+                               Offset="@toast_offset"
+                               Close="Close" />
+            toast_offset += toast_height + 14;
+        }
+    }
+</section>
+
+@code {
+    [Inject] private IToastService ToastService { get; set; } = default!;
+
+    private IReadOnlyList<ToastDefinition> Toasts = [];
+    private bool _shouldRender = true;
+    private bool Expanded = false;
+    private string ToasterId = Identifier.NewId();
+    private bool _disposed = false;
+    private CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync() {
+        ToastService.StateChange += OnStateChange;
+        await RefreshToastGroups();
+    }
+
+    private async Task RefreshToastGroups() {
+        Toasts = await ToastService.GetToasts();
+    }
+
+    private async Task SetExpanded(bool expanded) {
+        await SetPositionState(expanded);
+        OnStateChange();
+    }
+
+    private async Task SetPositionState(bool value) {
+        if (value)
+            await ToastService.Pause(ToasterId, _cts.Token);
+        else
+            await ToastService.Resume(ToasterId, _cts.Token);
+
+        Expanded = value;
+    }
+
+    public async Task Close(string id) {
+        await ToastService.Dismiss(id);
+    }
+
+    protected override bool ShouldRender()
+        => _shouldRender;
+
+    private async Task HandleStateChanged() {
+        await RefreshToastGroups();
+        _shouldRender = true;
+        StateHasChanged();
+    }
+
+    private void OnStateChange() {
+        _ = InvokeAsync(HandleStateChanged);
+    }
+
+    public void Dispose() {
+        _disposed= true;
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

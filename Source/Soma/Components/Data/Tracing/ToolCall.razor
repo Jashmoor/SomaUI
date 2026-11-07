@@ -1,0 +1,32 @@
+﻿@namespace SomaUI.Tracing
+
+@if (Part.Output is null)
+{
+    <TraceLine Status="LineStatus"><TraceTitle>@Title</TraceTitle></TraceLine>
+}
+else
+{
+    <TraceCollapsible>
+        <TraceCollapsibleTrigger>
+            <TraceLine Status="LineStatus"><TraceTitle>@Title</TraceTitle></TraceLine>
+        </TraceCollapsibleTrigger>
+        <TraceCollapsibleContent><pre class="text-xs">@Part.Output</pre></TraceCollapsibleContent>
+    </TraceCollapsible>
+}
+
+@code {
+    [Parameter, EditorRequired] public ToolCallPart Part { get; set; } = default!;
+
+    private TraceStatus LineStatus => Part.State switch {
+        ToolCallState.Running => TraceStatus.Running,
+        ToolCallState.Failed => TraceStatus.Error,
+        _ => TraceStatus.None
+    };
+
+    // Status goes in the title too, since colour and motion aren't accessible on their own
+    private string Title => Part.State switch {
+        ToolCallState.Running => $"Running {Part.Name}",
+        ToolCallState.Failed => $"Failed to run {Part.Name}",
+        _ => $"Ran {Part.Name}"
+    };
+}

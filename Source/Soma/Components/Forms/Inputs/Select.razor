@@ -1,0 +1,49 @@
+﻿@namespace SomaUI
+@inherits FormComponent<TItem>
+@typeparam TItem
+
+<div class="select">
+    <select @ref="Element"
+            id="@(FieldContext?.Id ?? UniqueID)"
+            select
+            disabled="@Disabled"
+            @bind:get="@Value"
+            @bind:set="UpdateValue"
+            error="@(!EditContext?.IsValid(_Field) == true)"
+    >
+        @if (!string.IsNullOrEmpty(Placeholder))
+        {
+            <option option disabled selected="@(Value == null || Value.Equals(default(TItem)))">
+                @Placeholder
+            </option>
+        }
+        @ChildContent
+    </select>
+</div>
+
+@code {
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
+
+    private InputValidation? Validation;
+
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        Validation = new(this, () => EditContext, () => true, () => FieldContext?.Id ?? UniqueID!);
+    }
+
+    protected override void OnParametersSet() {
+        base.OnParametersSet();
+
+        if (Validation is not null)
+            Validation.OnParametersSet((For ?? ValueExpression));
+    }
+
+    private async Task UpdateValue(TItem? value) {
+        var string_value = value?.ToString();
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+        if (Validation is not null)
+            await Validation.NotifyFieldChanged();
+    }
+}

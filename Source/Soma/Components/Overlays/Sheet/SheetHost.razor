@@ -1,0 +1,39 @@
+﻿@namespace SomaUI
+@inject SheetService SheetService
+
+@if (SheetService.Sheets.Any())
+{
+    @foreach (var (sheet, index) in SheetService.Sheets.Select((sheet, index) => (sheet, index)))
+    {
+        <Sheet @key="sheet.Id" Open="true" IsClosing="sheet.IsClosing" OpenChanged="@((bool open) => { if (!open) { SheetService.FinalizeClose(sheet.Id, null); } })">
+            <SheetContent ZIndex="@(50 + (index * 10))" Options="sheet.Options" Side="sheet.Options.Side">
+                <CascadingValue Value="new SheetContext(sheet, SheetService)" IsFixed="true">
+                    @if (sheet.ComponentType is not null)
+                    {
+                        <DynamicComponent Type="@sheet.ComponentType" Parameters="@sheet.Parameters" />
+                    }
+                    @if (sheet.Content is not null)
+                    {
+                        @sheet.Content
+                    }
+                </CascadingValue>
+            </SheetContent>
+        </Sheet>
+    }
+}
+
+@code {
+    [Parameter] public EventCallback<bool> SheetToggle { get; set; }
+
+    protected override void OnInitialized() {
+        SheetService.OnChange += HandleStateChange;
+    }
+
+    private void HandleStateChange() {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() {
+        SheetService.OnChange -= HandleStateChange;
+    }
+}

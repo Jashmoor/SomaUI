@@ -1,0 +1,45 @@
+﻿@namespace SomaUI.Tracing
+
+@if (Node is TraceGroupNode group)
+{
+    <TraceCollapsible Open="@(_userOpen ?? group.Status == TraceStatus.Running)"
+                      OpenChanged="v => _userOpen = v">
+        <TraceCollapsibleTrigger>@Line(group)</TraceCollapsibleTrigger>
+        <TraceCollapsibleContent>
+            <Trace>
+                @foreach (var child in group.Children)
+                {
+                    <TraceNodeView Node="child" />
+                }
+            </Trace>
+        </TraceCollapsibleContent>
+    </TraceCollapsible>
+}
+else if (Node is TraceStepNode { Detail: not null } step)
+{
+    <TraceCollapsible>
+        <TraceCollapsibleTrigger>@Line(step)</TraceCollapsibleTrigger>
+        <TraceCollapsibleContent>@step.Detail</TraceCollapsibleContent>
+    </TraceCollapsible>
+}
+else if (Node is TraceStepNode { Href: not null } link)
+{
+    <a href="@link.Href" target="_blank" rel="noreferrer">@Line(link)</a>
+}
+else
+{
+    @Line(Node)
+}
+
+@code {
+    [Parameter, EditorRequired] public TraceNode Node { get; set; } = default!;
+
+    // "open ?? running": auto-open while streaming, but the reader's click wins
+    private bool? _userOpen;
+
+    private RenderFragment Line(TraceNode n) => @<TraceLine Status="n.Status">
+        @if (n.Icon is not null) { <TraceIcon>@n.Icon</TraceIcon> }
+        <TraceTitle>@n.Title</TraceTitle>
+        @if (n.Description is not null) { <TraceDescription>@n.Description</TraceDescription> }
+    </TraceLine>;
+}

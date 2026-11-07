@@ -1,0 +1,39 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<span dropdown-trigger
+     @ref="Element"
+     @onclick="Open"
+     @attributes="Attributes"
+     type="button"
+     id="@Context.TriggerId"
+     aria-controls="@Context.ContentId">
+    @ChildContent
+</span>
+
+@code {
+    [CascadingParameter] internal DropdownContext Context { get; set; } = default!;
+
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+
+    private async Task Open(MouseEventArgs args) {
+        if (Disabled)
+            return;
+
+        Context.Toggle(Element);
+
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync(args);
+    }
+
+    protected override void OnInitialized() {
+        if (Context == null)
+            throw new InvalidOperationException("Missing Dropdown Context, Trigger must be within a [Dropdown] Component");
+    }
+
+    protected override void OnAfterRender(bool firstRender) {
+        Context.SetTriggerElement(Element);
+        base.OnAfterRender(firstRender);
+    }
+}
