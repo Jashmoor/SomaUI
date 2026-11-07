@@ -22,12 +22,13 @@
         {
             if (Parent.Element is ElementReference element)
             {
-                await Service.CalculatePosition<object>(element, UniqueID, null!, new {
+                var a = await Service.CalculatePosition<object>(element, UniqueID, null!, new {
                     placement = "bottom",
-                    offset = 10
+                    offset = 10,
+                    strategy = "fixed"
                 });
             }
-
+            _positioned = true;
             await InvokeAsync(StateHasChanged);
         }
         else

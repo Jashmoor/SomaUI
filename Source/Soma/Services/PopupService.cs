@@ -4,7 +4,7 @@ using Microsoft.JSInterop;
 namespace SomaUI;
 
 internal class PopupService(IJSRuntime javascript) : IPopupService {
-    private const string __Javascript = "./_content/Library/js/popup-service.js";
+    private const string __Javascript = "./_content/SomaUI/js/popup-service.js";
     private IJSObjectReference? _Module;
 
     private async ValueTask<IJSObjectReference> GetModule() {
@@ -12,15 +12,16 @@ internal class PopupService(IJSRuntime javascript) : IPopupService {
         return _Module;
     }
 
-    public async ValueTask CalculatePosition<T>(ElementReference element, string id, DotNetObjectReference<T> dotnet, object? options = null) where T : class {
+    public async ValueTask<object> CalculatePosition<T>(ElementReference element, string id, DotNetObjectReference<T> dotnet, object? options = null) where T : class {
         try
         {
             var module = await GetModule();
-            await module.InvokeVoidAsync("CalculatePosition", element, id, dotnet, options ?? new());
+            return await module.InvokeAsync<object>("CalculatePosition", element, id, dotnet, options ?? new());
 
         }
         catch (Exception e)
         {
+            return new {};
         }
     }
 

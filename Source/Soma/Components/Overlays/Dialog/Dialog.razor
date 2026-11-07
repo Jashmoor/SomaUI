@@ -13,7 +13,7 @@
     private bool _internal;
     public bool Closing => IsClosing || _internal;
 
-    internal async Task SetOpen(bool open) {
+    public async Task SetOpen(bool open) {
         if (!open && Open && !Closing)
         {
             _internal = true;

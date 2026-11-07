@@ -46,7 +46,10 @@
             _ = State.SetValueAsync(new_state);
 
             if (new_state)
-                InvokeAsync(() => Service.CalculatePosition<Dropdown>(Element, _context.ContentId, _reference!, Sync));
+                InvokeAsync(() => Service.CalculatePosition<Dropdown>(Element, _context.ContentId, _reference!, new
+                {
+                    sync = Sync
+                }));
             else
                 InvokeAsync(() => Service.ClosePopup(_context.Id, _context.ContentId));
 

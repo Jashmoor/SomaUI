@@ -95,6 +95,13 @@ export function CalculatePosition(element, target, dotnet, options = {}) {
     if (dotnet) {
         AddClickOutsideHandler(element, dotnet);
     }
+
+    return {
+        top: y,
+        left: x,
+        width: sync ? $parent_width : $target_width,
+        height: $target_height
+    };
 }
 
 function getTransformOrigin(placement) {

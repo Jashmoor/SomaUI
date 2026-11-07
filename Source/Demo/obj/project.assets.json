@@ -561,5 +561,13 @@
         }
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://aggorateam.pkgs.visualstudio.com/_packaging/Web-UI-Package-Feed/nuget/v3/index.json."
+    }
+  ]
 }

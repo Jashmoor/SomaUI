@@ -123,6 +123,7 @@ html:has( [popover][open]) {
 [popover] {
     position-anchor: --popover;
     position: fixed;
+    position: sticky;
     z-index: 101;
     background: var(--popover);
     border-radius: var(--spacing-sm);
@@ -151,6 +152,7 @@ html:has( [popover][open]) {
 
     &[data-state='open'] {
         opacity: 1;
+        inline-size: fit-content;
 
         @starting-style {
             opacity: 0;

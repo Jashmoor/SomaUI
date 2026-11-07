@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SomaUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3fb5a296fe255c1195a0db952ea58d22fdbc6aae")]
 [assembly: System.Reflection.AssemblyProductAttribute("SomaUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SomaUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

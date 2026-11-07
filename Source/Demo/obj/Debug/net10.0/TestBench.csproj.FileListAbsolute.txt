@@ -20,6 +20,7 @@ C:\Users\joseph.cashmore\source\repos\ComponentLibrary\Source\Demo\obj\Debug\net
 C:\Users\joseph.cashmore\source\repos\ComponentLibrary\Source\Demo\obj\Debug\net10.0\TestBench.AssemblyInfo.cs
 C:\Users\joseph.cashmore\source\repos\ComponentLibrary\Source\Demo\obj\Debug\net10.0\TestBench.csproj.CoreCompileInputs.cache
 C:\Users\joseph.cashmore\source\repos\ComponentLibrary\Source\Demo\obj\Debug\net10.0\TestBench.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\joseph.cashmore\source\repos\ComponentLibrary\Source\Demo\obj\Debug\net10.0\TestBench.sourcelink.json
 C:\Users\joseph.cashmore\source\repos\ComponentLibrary\Source\Demo\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\Users\joseph.cashmore\source\repos\ComponentLibrary\Source\Demo\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\joseph.cashmore\source\repos\ComponentLibrary\Source\Demo\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
