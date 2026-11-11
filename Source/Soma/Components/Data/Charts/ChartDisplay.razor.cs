@@ -5,7 +5,7 @@ using System.Globalization;
 namespace SomaUI;
 
 public partial class ChartDisplay : BaseComponent, IDisposable {
-    private const string __Javascript = "./_content/Library/Components/Data/Charts/ChartDisplay.razor.js";
+    private const string __Javascript = "./_content/SomaUI/Components/Data/Charts/ChartDisplay.razor.js";
     [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
     [Parameter] public RenderFragment ChildContent { get; set; } = default!;
     [Parameter] public ChartConfig Config { get; set; } = new();

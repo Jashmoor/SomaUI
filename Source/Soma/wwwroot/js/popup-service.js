@@ -3,6 +3,16 @@ const $listeners = new Map();
 const $keylisteners = new Map();
 const $scrolllisteners = new Map();
 const ANIMATE_GAP = 100;
+const trackers = new Map();
+
+export function ApplyRemotePosition(str, target, dotnet, options = {}) {
+    const element = document.querySelector(str);
+    if (!element) return;
+    Track(element, target, dotnet);
+
+    return CalculatePosition(element, target, dotnet, options);
+}
+
 
 export function CalculatePosition(element, target, dotnet, options = {}) {
     clearTimeout(TIMEOUT);
@@ -97,22 +107,20 @@ export function CalculatePosition(element, target, dotnet, options = {}) {
     }
 
     return {
-        top: y,
-        left: x,
+        top: Math.round(y),
+        left: Math.round(x),
         width: sync ? $parent_width : $target_width,
         height: $target_height
     };
 }
 
 function getTransformOrigin(placement) {
-    const placements = {
+    return {
         'top': 'bottom center',
         'bottom': 'top center',
         'left': 'center right',
         'right': 'center left',
-    };
-
-    return placements[placement] || 'center';
+    }[placement] || 'center';
 }
 
 export function ClosePopup(id, target) {
@@ -179,4 +187,42 @@ export function RemoveListener(id) {
         document.removeEventListener('scroll', scroll_listener);
         $scrolllisteners.delete(id);
     }
+}
+
+
+export function Track(el, selector, dotnetRef) {
+    if (!el)
+        return false;
+
+    el.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" });
+
+    let raf = 0;
+    const report = () => {
+        const r = el.getBoundingClientRect();
+        dotnetRef.invokeMethodAsync("OnRectChanged", r.x, r.y, r.width, r.height);
+    };
+    const schedule = () => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(report);
+    };
+
+    const ro = new ResizeObserver(schedule);
+    ro.observe(el);
+    window.addEventListener("scroll", schedule, true);
+    window.addEventListener("resize", schedule);
+
+    trackers.set(selector, () => {
+        cancelAnimationFrame(raf);
+        ro.disconnect();
+        window.removeEventListener("scroll", schedule, true);
+        window.removeEventListener("resize", schedule);
+    });
+
+    report();
+    return true;
+}
+
+export function UnTrack(id) {
+    trackers.get(id)?.();
+    trackers.delete(id);
 }

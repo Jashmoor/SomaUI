@@ -12,6 +12,18 @@ internal class PopupService(IJSRuntime javascript) : IPopupService {
         return _Module;
     }
 
+    public async ValueTask<object> ApplyRemotePosition<T>(string selector, string target, DotNetObjectReference<T> dotnet, object? options = null) where T : class {
+        try
+        {
+            var module = await GetModule();
+            return await module.InvokeAsync<object>("ApplyRemotePosition", selector, target, dotnet, options);
+        }
+        catch (Exception e)
+        {
+            return new { };
+        }
+    }
+
     public async ValueTask<object> CalculatePosition<T>(ElementReference element, string id, DotNetObjectReference<T> dotnet, object? options = null) where T : class {
         try
         {
@@ -21,8 +33,13 @@ internal class PopupService(IJSRuntime javascript) : IPopupService {
         }
         catch (Exception e)
         {
-            return new {};
+            return new { };
         }
+    }
+
+    public async ValueTask UnTrack(string id) {
+        var module = await GetModule();
+        await module.InvokeVoidAsync("UnTrack", id);
     }
 
     public async ValueTask ClosePopup(string id, string target) {

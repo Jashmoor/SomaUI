@@ -1,0 +1,87 @@
+﻿@namespace SomaUI
+@using Microsoft.JSInterop
+
+@* <div tour-blocker @onclick:stopPropagation="true"></div> *@
+
+@if (_rect is { } r)
+{
+    <div tour-spotlight
+         style="left:@(F(r.X - Padding))px; top:@(F(r.Y - Padding))px;
+    width:@(F(r.W + Padding * 2))px; height:@(F(r.H + Padding * 2))px;"></div>
+}
+
+<div id="@_id" tour-item data-state="@(_positioned ? "open" : "closed")">
+    <div tour-header>
+        <div tour-title>@Title</div>
+        <div tour-description>@Title</div>
+        <div tour-guide>
+            <span>@StepNumber / @StepCount</span>
+        </div>
+        <div tour-progress>
+            <Progress Max="@StepCount" Value="@StepNumber" />
+        </div>
+    </div>
+    <div tour-content>
+        @ChildContent
+    </div>
+    <div tour-footer>
+        <Button OnClick="OnCancel" Variant="ButtonVariant.Default">Skip</Button>
+        <Button OnClick="OnNext">@(IsLast ? "Finish" : "Next")</Button>
+    </div>
+</div>
+
+@code {
+    [Inject] private IPopupService Service { get; set; } = default!;
+
+    [Parameter] public string Attach { get; set; } = string.Empty;
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Description { get; set; } = string.Empty;
+    [Parameter] public int StepNumber { get; set; }
+    [Parameter] public int StepCount { get; set; }
+    [Parameter] public bool IsLast { get; set; }
+    [Parameter] public EventCallback OnNext { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Placement { get; set; } = "bottom";
+    [Parameter] public int Padding { get; set; } = 4;
+
+    private record struct Rect(double X, double Y, double W, double H);
+    private Rect? _rect;
+    private readonly string _id = $"tour-{Guid.NewGuid():N}";
+    private static string F(double v) => v.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    private DotNetObjectReference<TourPopup>? _self;
+    private bool _positioned = false;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (!firstRender) return;
+
+        _self = DotNetObjectReference.Create(this);
+        await Service.ApplyRemotePosition<TourPopup>(Attach, _id, _self, new {
+            placement = Placement,
+            offset = 10,
+            strategy = "fixed"
+        });
+        _positioned = true;
+    }
+
+    [JSInvokable]
+    public void OnRectChanged(double x, double y, double w, double h) {
+        _rect = new Rect(x, y, w, h);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void JavascriptClose() { }
+
+    public async ValueTask DisposeAsync() {
+        try
+        {
+            if (Service is not null)
+                await Service.UnTrack(_id);
+        }
+        catch (JSDisconnectedException) { }
+
+        _self?.Dispose();
+    }
+}

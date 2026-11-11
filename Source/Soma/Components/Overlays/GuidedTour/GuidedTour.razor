@@ -1,0 +1,80 @@
+﻿@namespace SomaUI
+@inherits BaseWithChildComponent
+
+<div guided-tour>
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnTourStart { get; set; }
+    [Parameter] public EventCallback OnTourComplete { get; set; }
+    [Parameter] public EventCallback OnTourCancelled { get; set; }
+    [Parameter] public bool AutoStart { get; set; } = false;
+
+    private readonly List<TourItem> _registered = new();
+    private List<TourItem> _steps = new();
+    private int _index = -1;
+
+    internal TourState State { get; private set; } = TourState.NotStarted;
+    public TourItem? ActiveItem => State == TourState.Running && _index >= 0 && _index < _steps.Count
+        ? _steps[_index] : null;
+    public int StepNumber => _index + 1;
+    public int StepCount => _steps.Count;
+    public bool IsLastStep => _index == _steps.Count - 1;
+
+    protected override async Task OnAfterRenderAsync(bool first) {
+        if (first && AutoStart)
+            await StartAsync();
+    }
+
+    internal event Action? Changed;
+
+    internal void Register(TourItem item) {
+        if (!_registered.Contains(item)) _registered.Add(item);
+    }
+
+    internal void Unregister(TourItem item)
+        => _registered.Remove(item);
+
+    public async Task StartAsync() {
+        _steps = _registered.Where(i => !i.Disabled).OrderBy(i => i.Order).ToList();
+        if (_steps.Count == 0) return;
+
+        _index = 0;
+        State = TourState.Running;
+        await OnTourStart.InvokeAsync();
+        await NotifyAsync();
+    }
+
+    public async Task NextAsync() {
+        if (State != TourState.Running) return;
+
+        if (_index < _steps.Count - 1)
+        {
+            _index++;
+            await NotifyAsync();
+            return;
+        }
+
+        State = TourState.Completed;
+        _index = -1;
+        await OnTourComplete.InvokeAsync();
+        await NotifyAsync();
+    }
+
+    public async Task CancelAsync() {
+        if (State != TourState.Running) return;
+
+        State = TourState.Cancelled;
+        _index = -1;
+        await OnTourCancelled.InvokeAsync();
+        await NotifyAsync();
+    }
+
+    private async Task NotifyAsync() {
+        Changed?.Invoke();
+        await InvokeAsync(StateHasChanged);
+    }
+}

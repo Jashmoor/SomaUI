@@ -1,11 +1,44 @@
 ﻿@page "/layout"
 @rendermode InteractiveServer
 
+<Button OnClick="Begin">Test Tour</Button>
+
+<GuidedTour AutoStart @ref="Tour">
+    <TourItem Attach="#tour-item-1" Title="First Step" Description="This is the first step of the tour." Order="1">
+        <Item>
+            <ItemMedia>
+        <img src="https://plus.unsplash.com/premium_photo-1794300053712-8e0607f4a3b8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D" />
+            </ItemMedia>
+            <ItemContent>
+                <ItemTitle>Step One</ItemTitle>
+                <ItemDescription>Click this one first</ItemDescription>
+            </ItemContent>
+        </Item>
+    </TourItem>
+    <TourItem Attach="#tour-item-2" Title="Second Step" Description="Another Step" Order="2" Placement="top">
+        <Card>
+            <CardHeader>
+                <CardTitle>Click here next</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ul>
+                    <li>One</li>
+                    <li>One</li>
+                    <li>One</li>
+                    <li>One</li>
+                </ul>
+            </CardContent>
+        </Card>
+    </TourItem>
+    <TourItem Attach="#tour-item-3" Title="Last Step" Description="Final Step" Order="3" Placement="left"></TourItem>
+</GuidedTour>
+
 <Container>
+
 
     <FeatureContainer>
         <GridItem class="s4 m4 l4">
-            <Card>
+            <Card id="tour-item-1">
                 <CardHeader>
                     <CardTitle>One</CardTitle>
                 </CardHeader>
@@ -37,8 +70,8 @@
     <GridLayout>
         <GridItem class="s4 m4 l6">
             <FeatureContainer>
-                <GridItem class="s4 m4 l4">
-                    <Card>
+                <GridItem class="s4 m4 l4" >
+                    <Card id="tour-item-2">
                         <CardHeader>
                             <CardTitle>Five</CardTitle>
                         </CardHeader>
@@ -67,8 +100,8 @@
                 </GridItem>
             </FeatureContainer>
         </GridItem>
-        <GridItem class="s4 m3 l6">
-            <Card>
+        <GridItem class="s4 m3 l6" >
+            <Card id="tour-item-3">
                 <CardHeader>
                     <CardTitle>Nine</CardTitle>
                 </CardHeader>
@@ -273,5 +306,12 @@
 @code {
     private double Custom = 16.0/9.0;
 
+    private GuidedTour? Tour;
 
+    private async Task Begin()
+    {
+        if (Tour is null)
+            return;
+        await Tour.StartAsync();
+    }
 }

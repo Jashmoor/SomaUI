@@ -5,6 +5,7 @@
 <SectionOutlet SectionId="@Tooltip" />
 <SectionOutlet SectionId="@Popover" />
 <SectionOutlet SectionId="@Dropdown" />
+<SectionOutlet SectionId="@GuidedTour" />
 
 @* @foreach(var item in Service.Content)
 {
@@ -29,4 +30,5 @@
     internal static readonly object Tooltip = new();
     internal static readonly object Popover = new();
     internal static readonly object Dropdown = new();
+    internal static readonly object GuidedTour = new();
 }

@@ -2,7 +2,7 @@
 @inherits BaseComponent
 @typeparam TItem
 
-<figure data-grid>
+<figure data-grid @attributes="Attributes">
     <CascadingValue Value="Context" IsFixed="true">
         @{
             Context.BeginColumnIngestion();

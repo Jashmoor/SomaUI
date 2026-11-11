@@ -1,23 +1,33 @@
 ﻿@page "/Data"
 @rendermode InteractiveServer
 
+
+<GuidedTour AutoStart>
+    <TourItem Title="Delete these" Description="" Order="1" Attach="#tour-item-1">
+        <span>Delete stuff here</span>
+    </TourItem>
+    <TourItem Title="Look at this" Description="This is a table" Order="2" Attach="#tour-item-2"></TourItem>
+    <TourItem Title="Click this button" Description="" Order="3" Attach="#tour-item-3"></TourItem>
+</GuidedTour>
+
+
 <Container>
 
-    <Button OnClick="FirePreventable">
+    <Button OnClick="FirePreventable" id="tour-item-3">
         Test
     </Button>
     <h1>Data</h1>
     @* @Selected.Count *@
     @Counter
 
-    <ScrollArea>
+    <ScrollArea id="tour-item-1">
         @foreach (var item in List)
         {
             <li animate fade-in @onclick="async () => await UserDelete(item)">@item.Name</li>
         }
     </ScrollArea>
 
-    <DataTable TItem="@ExampleData" Items="Data" @bind-SelectedItems="@Selected">
+    <DataTable TItem="@ExampleData" Items="Data" @bind-SelectedItems="@Selected" id="tour-item-2">
         @*         <GroupHeaderTemplate Context="group">
             <Item>
                 <ItemContent>
